@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Order Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f6f6f6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        h2 {
+            color: #2c3e50;
+        }
+        .order-summary {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .order-summary th, .order-summary td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        .order-summary th {
+            background-color: #f0f0f0;
+            text-align: left;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Thank you for your order, {{ order.order_name }}!</h2>
+        <p>Your order has been placed successfully. Below are your order details:</p>
+
+        <p><strong>Order ID:</strong> {{ order.order_id }}<br>
+        <strong>Payment ID:</strong> {{ order.payment_id }}<br>
+        <strong>Shipping Address:</strong> {{ order.delivery_address }}</p>
+
+        <h3>Items Ordered:</h3>
+        <table class="order-summary">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Size</th>
+                    <th>Color</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.size_name or '-' }}</td>
+                    <td>{{ item.color_name or '-' }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ "%.2f"|format(item.price_at_purchase) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <p><strong>Shipping Method:</strong> {{ order.shipping_method }}<br>
+        <strong>Status:</strong> {{ order.status }}</p>
+
+        <p>We’ll notify you once your order is shipped.</p>
+
+        <div class="footer">
+            &copy; {{ current_year }} Prauxe. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

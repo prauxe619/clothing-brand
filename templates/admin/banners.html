@@ -1,0 +1,71 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h2 class="text-xl font-bold mb-4">Manage Homepage Banners</h2>
+
+<form method="POST" enctype="multipart/form-data" class="space-y-4">
+  {{ form.hidden_tag() }}
+
+  <div>
+    {{ form.image.label }}<br>
+    {{ form.image() }}
+  </div>
+
+  <div>
+    {{ form.heading.label }}<br>
+    {{ form.heading(class="w-full") }}
+  </div>
+
+  <div>
+    {{ form.subheading.label }}<br>
+    {{ form.subheading(class="w-full") }}
+  </div>
+
+  <div>
+    {{ form.link.label }}<br>
+    {{ form.link(class="w-full") }}
+  </div>
+
+  <div>
+    {{ form.is_active() }}
+    {{ form.is_active.label }}
+  </div>
+
+  <div>
+    {{ form.submit(class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded") }}
+  </div>
+</form>
+
+<hr class="my-6">
+
+<h3 class="text-lg font-semibold mb-2">Existing Banners</h3>
+<table class="w-full border text-sm">
+  <thead>
+    <tr>
+      <th>Image</th>
+      <th>Heading</th>
+      <th>Link</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for banner in banners %}
+    <tr>
+      <td><img src="{{ banner.image_path }}" alt="Banner" class="h-16"></td>
+      <td>{{ banner.heading or '—' }}</td>
+      <td>{{ banner.link or '—' }}</td>
+      <td>{{ 'Active' if banner.is_active else 'Hidden' }}</td>
+      <td>
+        <form method="POST" action="{{ url_for('admin.delete_banner', banner_id=banner.id) }}" onsubmit="return confirm('Delete this banner?');">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button class="text-red-500 hover:underline">Delete</button>
+</form>
+
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No banners added yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

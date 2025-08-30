@@ -1,0 +1,63 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-6">Admin Dashboard</h1>
+
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+  <div class="bg-white shadow rounded-xl p-4">
+    <p class="text-gray-600">Total Orders</p>
+    <p class="text-xl font-semibold">{{ total_orders }}</p>
+  </div>
+  <div class="bg-white shadow rounded-xl p-4">
+    <p class="text-gray-600">Total Users</p>
+    <p class="text-xl font-semibold">{{ total_users }}</p>
+  </div>
+  <div class="bg-white shadow rounded-xl p-4">
+    <p class="text-gray-600">Total Products</p>
+    <p class="text-xl font-semibold">{{ total_products }}</p>
+  </div>
+  <div class="bg-white shadow rounded-xl p-4">
+    <p class="text-gray-600">Today's Sales</p>
+    <p class="text-xl font-semibold">₹{{ today_sales or 0 }}</p>
+  </div>
+  <div class="bg-white shadow rounded-xl p-4">
+    <p class="text-gray-600">This Month's Revenue</p>
+    <p class="text-xl font-semibold">₹{{ month_revenue or 0 }}</p>
+  </div>
+</div>
+
+{% if low_stock %}
+<h2 class="text-xl font-bold mt-8 mb-4">⚠️ Low Stock Alerts</h2>
+<ul class="list-disc ml-6">
+  {% for p in low_stock %}
+    <li>{{ p.name }} ({{ p.stock }} left)</li>
+  {% endfor %}
+</ul>
+{% endif %}
+<h2 class="text-xl font-bold mt-10 mb-4">🕒 Recent Orders</h2>
+<table class="w-full text-sm border shadow-sm">
+  <thead class="bg-gray-100">
+    <tr>
+      <th class="p-2 text-left">Order ID</th>
+      <th class="p-2 text-left">User</th>
+      <th class="p-2 text-left">Amount</th>
+      <th class="p-2 text-left">Status</th>
+      <th class="p-2 text-left">Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in recent_orders %}
+    <tr class="border-b">
+      <td class="p-2">{{ order.id }}</td>
+      <td class="p-2">{{ order.user.name if order.user else 'Guest' }}</td>
+      <td class="p-2">₹{{ order.total_amount }}</td>
+      <td class="p-2">{{ order.status }}</td>
+      <td class="p-2">{{ order.created_at.strftime('%d %b, %Y %H:%M') }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" class="p-2">No recent orders.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

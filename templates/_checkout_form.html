@@ -1,0 +1,123 @@
+<form id="shipping-details-form" method="POST" action="{{ url_for('create_order') }}" class="space-y-5">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="amount" value="{{ '%.2f'|format(total) }}">
+
+  <!-- ✅ Saved Addresses -->
+  {% if saved_addresses %}
+  <div>
+    <h4 class="text-md font-semibold text-gray-800 mb-3">Choose Address</h4>
+    <div class="space-y-3">
+      {% for addr in saved_addresses %}
+      <div class="border rounded-lg p-3 bg-gray-50">
+        <label class="flex items-start gap-2 cursor-pointer">
+          <input type="radio" name="selected_address" value="{{ addr.id }}"
+                 data-name="{{ addr.recipient_name }}"
+                 data-email="{{ addr.email or user.email }}"
+                 data-phone="{{ addr.mobile }}"
+                 data-house_no="{{ addr.house_no }}"
+                 data-road="{{ addr.road }}"
+                 data-area="{{ addr.area }}"
+                 data-city="{{ addr.city }}"
+                 data-state="{{ addr.state }}"
+                 data-pincode="{{ addr.pincode }}"
+                 class="mt-1">
+          <div>
+            <p class="font-medium">{{ addr.recipient_name }}</p>
+            <p class="text-sm text-gray-600">
+              {{ addr.house_no }}, {{ addr.road }}, {% if addr.area %}{{ addr.area }}, {% endif %}{{ addr.city }}, {{ addr.state }} - {{ addr.pincode }}
+            </p>
+            <p class="text-xs text-gray-500">{{ addr.mobile }}{% if addr.email %} · {{ addr.email }}{% endif %}</p>
+          </div>
+        </label>
+        <div class="mt-2 flex gap-4 text-xs">
+          <a href="{{ url_for('edit_address', id=addr.id) }}" class="text-blue-600">Edit</a>
+          <form method="POST" action="{{ url_for('delete_address', id=addr.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="text-red-600">Delete</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <p class="text-sm text-gray-500">No saved addresses. Please add one below.</p>
+  {% endif %}
+
+  <!-- ✅ Add New Address Toggle -->
+  <div>
+    <button type="button" id="add-address-btn" 
+            class="text-sm text-blue-600 mb-2">
+      + Add new address
+    </button>
+    <div id="add-address-form" class="{% if saved_addresses %}hidden{% endif %} space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="text" id="name" name="name" placeholder="Full Name" required class="input-field" value="{{ name or '' }}">
+        <input type="email" id="email" name="email" placeholder="Email Address" required class="input-field" value="{{ email or '' }}">
+        <input type="tel" id="phone" name="phone" placeholder="Phone Number" required class="input-field" value="{{ phone or '' }}">
+        <input type="text" id="house_no" name="house_no" placeholder="House No." required class="input-field" value="{{ house_no or '' }}">
+        <input type="text" id="road" name="road" placeholder="Road/Street" required class="input-field" value="{{ road or '' }}">
+        <input type="text" id="area" name="area" placeholder="Area/Locality (optional)" class="input-field" value="{{ area or '' }}">
+        <input type="text" id="city" name="city" placeholder="City" required class="input-field" value="{{ city or '' }}">
+        <input type="text" id="state" name="state" placeholder="State" required class="input-field" value="{{ state or '' }}">
+        <div class="md:col-span-2">
+          <input type="text" id="pincode" name="pincode" placeholder="PIN Code" required class="input-field" value="{{ pincode or '' }}">
+          <p id="pincode-message" class="mt-2 text-sm"></p>
+        </div>
+      </div>
+      <!-- Save to profile -->
+      <label class="flex items-center space-x-2">
+        <input type="checkbox" name="save_to_profile" {% if save_to_profile %}checked{% endif %}
+               class="w-5 h-5 text-pink-600 border-gray-300 rounded focus:ring-pink-500">
+        <span class="text-gray-700">Save this address to my profile</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- ✅ Shipping Method as buttons -->
+  <div class="grid grid-cols-2 gap-4 mt-4">
+    <label class="flex items-center justify-center border rounded-lg py-3 cursor-pointer hover:bg-gray-50">
+      <input type="radio" id="cod" name="shipping_method" value="COD" class="hidden peer">
+      <span class="peer-checked:text-pink-600 font-medium">Cash on Delivery</span>
+    </label>
+    <label class="flex items-center justify-center border rounded-lg py-3 cursor-pointer hover:bg-gray-50">
+      <input type="radio" id="online" name="shipping_method" value="Online" class="hidden peer">
+      <span class="peer-checked:text-pink-600 font-medium">Card / Netbanking</span>
+    </label>
+  </div>
+
+  <!-- ✅ Continue Button -->
+  <button type="submit" id="proceed-to-payment-btn" 
+          class="w-full mt-4 flex items-center justify-center gap-2 px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
+    Continue ₹{{ "%.2f"|format(total) }}
+  </button>
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  // Toggle Add Address form
+  const addBtn = document.getElementById("add-address-btn");
+  const addForm = document.getElementById("add-address-form");
+  if(addBtn){
+    addBtn.addEventListener("click", () => {
+      addForm.classList.toggle("hidden");
+      addBtn.textContent = addForm.classList.contains("hidden") ? "+ Add new address" : "Close address form";
+    });
+  }
+
+  // Autofill form when saved address selected
+  document.querySelectorAll("input[name='selected_address']").forEach(radio => {
+    radio.addEventListener("change", () => {
+      document.getElementById("name").value = radio.dataset.name;
+      document.getElementById("email").value = radio.dataset.email;
+      document.getElementById("phone").value = radio.dataset.phone;
+      document.getElementById("house_no").value = radio.dataset.house_no;
+      document.getElementById("road").value = radio.dataset.road;
+      document.getElementById("area").value = radio.dataset.area;
+      document.getElementById("city").value = radio.dataset.city;
+      document.getElementById("state").value = radio.dataset.state;
+      document.getElementById("pincode").value = radio.dataset.pincode;
+    });
+  });
+});
+</script>

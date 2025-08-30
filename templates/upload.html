@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Profile Image</title>
+  <script>
+    function previewImage(event) {
+      const output = document.getElementById('preview');
+      output.src = URL.createObjectURL(event.target.files[0]);
+      output.onload = () => URL.revokeObjectURL(output.src); // free memory
+    }
+  </script>
+</head>
+<body class="bg-gray-100 py-10 px-4 min-h-screen font-sans">
+  <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-xl font-bold mb-4 text-center text-gray-700">Upload Profile Image</h2>
+    
+    <form action="/upload" method="post" enctype="multipart/form-data" class="space-y-4">
+      <input 
+        type="file" 
+        name="file" 
+        accept="image/*" 
+        onchange="previewImage(event)"
+        class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100" 
+        required
+      >
+
+      <!-- Show image preview -->
+      <img id="preview" src="#" alt="Image Preview" class="w-40 h-40 rounded-full mx-auto hidden" onload="this.classList.remove('hidden')" />
+
+      <button type="submit" class="w-full bg-pink-600 text-white py-2 rounded hover:bg-pink-700">
+        Upload Image
+      </button>
+    </form>
+  </div>
+</body>
+</html>

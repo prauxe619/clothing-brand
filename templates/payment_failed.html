@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Payment Failed | PRAUXE{% endblock %}
+
+{% block content %}
+<div class="container mx-auto mt-10 p-6 bg-white shadow-lg rounded-xl text-center">
+    <h2 class="text-3xl font-bold text-red-600 mb-4">Payment Failed! 😔</h2>
+    <p class="text-gray-700 text-lg mb-6">
+        We're sorry, but your payment could not be processed at this time.
+    </p>
+    <p class="text-gray-600 mb-8">
+        Please ensure your payment details are correct and try again. If the issue persists,
+        please contact our customer support.
+    </p>
+    <a href="{{ url_for('checkout') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-full transition duration-300 mr-4">
+        Try Payment Again
+    </a>
+    <a href="{{ url_for('home') }}" class="inline-block bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-6 py-3 rounded-full transition duration-300">
+        Back to Home
+    </a>
+</div>
+{% endblock %}

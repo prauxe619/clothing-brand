@@ -1,0 +1,489 @@
+{% block content %}
+<h3 class="text-2xl font-bold mb-6">Saved For Later ({{ wishlist_products|length }})</h3>
+
+<div class="space-y-4">
+    {% if wishlist_products %}
+        {% for product in wishlist_products %}
+        <div data-wishlist-card
+             class="flex flex-col sm:flex-row items-start sm:items-center gap-6 bg-white p-6 shadow squareed-lg border border-gray-200">
+
+            {# Product Image - Clickable & Larger #}
+            <a href="{{ url_for('product_details', product_id=product.id) }}" class="w-32 h-32 min-w-[8rem] min-h-[8rem] flex-shrink-0 squareed-lg bg-gray-100 overflow-hidden border border-gray-200">
+                <img src="{{ product.image }}"
+                     alt="{{ product.name }}"
+                     class="w-full h-full object-cover" />
+            </a>
+
+            <div class="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-between w-full pr-4">
+                <div class="flex-1 text-center sm:text-left">
+                    <a href="{{ url_for('product_details', product_id=product.id) }}" class="text-lg font-semibold text-gray-800 hover:text-pink-600 transition">{{ product.name }}</a>
+                    <p class="text-gray-500 text-sm mt-1">₹{{ "%.2f"|format(product.price) }}</p>
+                    {% if product.selected_size_name %}
+                        <p class="text-gray-500 text-sm mt-1">Size: {{ product.selected_size_name }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0 mt-4 sm:mt-0 w-full sm:w-auto">
+                    <button type="button"
+                            class="add-to-cart-from-wishlist-btn flex items-center justify-center px-4 py-2 bg-pink-600 text-white text-sm font-semibold squareed-md hover:bg-pink-700 transition whitespace-nowrap w-full sm:w-auto"
+                            data-product-id="{{ product.id }}"
+                            data-product-name="{{ product.name | e }}"
+                            data-product-image="{{ product.image }}"
+                            data-size="{{ product.selected_size_name | default('N/A', true) | e }}"
+                            data-color="{{ product.selected_color_name | default('N/A', true) | e }}"
+                            data-has-sizes="{{ 'true' if product.has_sizes else 'false' }}"
+                            data-has-colors="{{ 'true' if product.has_colors else 'false' }}">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.95-.624l3-6A1 1 0 0017 3H6.293L6 2H3zm0 14a1 1 0 100 2 1 1 0 000-2zm9 0a1 1 0 100 2 1 1 0 000-2z"></path></svg>
+                        Move to Cart
+                    </button>
+
+                    <button type="button" class="remove-from-wishlist-btn flex items-center justify-center px-4 py-2 border border-gray-300 text-gray-700 text-sm font-semibold squareed-md hover:bg-gray-100 transition whitespace-nowrap w-full sm:w-auto"
+                            data-product-id="{{ product.id }}">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 000-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                        Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center text-gray-500 mt-8">
+            <p>Your wishlist is empty! 🙁</p>
+            <a href="{{ url_for('home') }}" class="inline-block mt-4 text-pink-600 hover:underline">Start adding products</a>
+        </div>
+    {% endif %}
+</div>
+
+{# Modal for size/color selection #}
+<div id="size-color-selection-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm mx-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-gray-800">Select Options for <span id="modal-product-name" class="text-pink-600"></span></h2>
+            <button id="close-modal" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+        </div>
+
+        <div id="modal-options-container" class="space-y-4">
+            <div id="modal-size-section" class="hidden">
+                <p class="text-sm font-semibold text-gray-700 mb-2">Select Size:</p>
+                <div id="modal-size-options" class="grid grid-cols-3 gap-2"></div>
+            </div>
+
+            <div id="modal-color-section" class="hidden">
+                <p class="text-sm font-semibold text-gray-700 mb-2">Select Color:</p>
+                <div id="modal-color-options" class="flex flex-wrap gap-2"></div>
+            </div>
+        </div>
+
+        <button id="add-to-cart-from-modal-btn" class="w-full bg-pink-600 text-white py-2 rounded-md hover:bg-pink-700 transition disabled:opacity-50 disabled:cursor-not-allowed mt-6" disabled>
+            Add to Cart
+        </button>
+        <p id="modal-error-message" class="text-red-500 text-sm mt-2 hidden text-center"></p>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // --- Config & DOM references ---
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    if (!csrfToken) console.warn("CSRF token missing from meta tag — AJAX POSTs may fail.");
+
+    const modal = document.getElementById('size-color-selection-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const modalProductName = document.getElementById('modal-product-name');
+    const modalSizeSection = document.getElementById('modal-size-section');
+    const modalSizeOptions = document.getElementById('modal-size-options');
+    const modalColorSection = document.getElementById('modal-color-section');
+    const modalColorOptions = document.getElementById('modal-color-options');
+    const addToCartFromModalBtn = document.getElementById('add-to-cart-from-modal-btn');
+    const modalErrorMessage = document.getElementById('modal-error-message');
+
+    // --- State ---
+    let lastClickedWishlistBtn = null;
+    let currentProductId = null;
+    let selectedSize = null;
+    let selectedColor = null;
+    let hasSizes = false;
+    let hasColors = false;
+
+    // --- Helpers ---
+    function safeString(x) {
+        if (x === null || x === undefined) return '';
+        return String(x);
+    }
+
+    function extractName(obj) {
+        if (obj === null || obj === undefined) return '';
+        if (typeof obj === 'string' || typeof obj === 'number' || typeof obj === 'boolean') return String(obj);
+        return String(obj.name || obj.label || obj.value || obj.colour || obj.color_name || '');
+    }
+
+    function createOptionButton(text, type) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = text;
+        btn.className = (type === 'size' ? 'size-option ' : 'color-option ') + 'px-3 py-2 border rounded-md text-sm font-medium bg-gray-100 text-gray-800 hover:border-pink-600 hover:bg-pink-50 hover:text-pink-600 transition';
+        return btn;
+    }
+
+    function normalizeKey(productId, size, color) {
+        const sizePart = (size && size !== 'N/A') ? String(size) : 'None';
+        const colorPart = (color && color !== 'N/A') ? String(color) : 'None';
+        return `${productId}-${sizePart}-${colorPart}`;
+    }
+
+    function updateHeaderCounts({ bag_count, wishlist_count } = {}) {
+        if (typeof bag_count !== 'undefined') {
+            const el = document.getElementById('bag-item-count');
+            if (el) el.textContent = bag_count;
+        }
+        if (typeof wishlist_count !== 'undefined') {
+            const el = document.getElementById('wishlist-count');
+            if (el) el.textContent = wishlist_count;
+        }
+    }
+
+    function findWishlistCardByProductId(productId) {
+        // find first matching data-wishlist-card with same product id attribute
+        return document.querySelector(`[data-wishlist-card] [data-product-id="${productId}"]`)?.closest('[data-wishlist-card]') || document.querySelector(`[data-wishlist-card][data-product-id="${productId}"]`);
+    }
+
+    function resetModal() {
+        currentProductId = null;
+        selectedSize = null;
+        selectedColor = null;
+        hasSizes = false;
+        hasColors = false;
+        modalProductName.textContent = '';
+        modalSizeOptions.innerHTML = '';
+        modalColorOptions.innerHTML = '';
+        modalSizeSection.classList.add('hidden');
+        modalColorSection.classList.add('hidden');
+        addToCartFromModalBtn.disabled = true;
+        modalErrorMessage.classList.add('hidden');
+    }
+
+    function openModal(opts) {
+        // opts: { productId, productName, initialSize, initialColor, inferredHasSizes, inferredHasColors, productImage }
+        resetModal();
+        currentProductId = opts.productId;
+        modalProductName.textContent = opts.productName || '';
+
+        hasSizes = !!opts.inferredHasSizes;
+        hasColors = !!opts.inferredHasColors;
+
+        // fetch options
+        fetch(`/api/product_variants/${opts.productId}`)
+        .then(res => {
+            if (!res.ok) throw new Error('variants not available');
+            return res.json();
+        })
+        .then(json => ({ sizes: json.sizes || [], colors: json.colors || [], price: json.product_price }))
+        .catch(() => {
+            // fallback to separate endpoints
+            return Promise.allSettled([
+                fetch(`/api/product_sizes/${opts.productId}`).then(r => r.ok ? r.json() : ({ sizes: [] })).catch(()=>({ sizes: [] })),
+                fetch(`/api/product_colors/${opts.productId}`).then(r => r.ok ? r.json() : ({ colors: [] })).catch(()=>({ colors: [] }))
+            ]).then(results => {
+                const sizes = (results[0] && results[0].status === 'fulfilled') ? (results[0].value.sizes || []) : [];
+                const colors = (results[1] && results[1].status === 'fulfilled') ? (results[1].value.colors || []) : [];
+                return { sizes, colors, price: null };
+            });
+        })
+        .then(({ sizes, colors }) => {
+            const normSizes = (sizes || []).map(s => ({ name: extractName(s) })).filter(x => x.name);
+            const normColors = (colors || []).map(c => ({ name: extractName(c) })).filter(x => x.name);
+
+            hasSizes = hasSizes || normSizes.length > 0;
+            hasColors = hasColors || normColors.length > 0;
+
+            // render sizes
+            if (hasSizes && normSizes.length > 0) {
+                modalSizeSection.classList.remove('hidden');
+                modalSizeOptions.innerHTML = '';
+                normSizes.forEach(s => {
+                    const btn = createOptionButton(s.name, 'size');
+                    btn.dataset.size = s.name;
+                    btn.addEventListener('click', function() {
+                        modalSizeOptions.querySelectorAll('.size-option').forEach(b => b.classList.remove('bg-pink-600','text-white'));
+                        this.classList.add('bg-pink-600','text-white');
+                        selectedSize = this.dataset.size;
+                        addToCartFromModalBtn.disabled = false;
+                    });
+                    modalSizeOptions.appendChild(btn);
+
+                    if (opts.initialSize && s.name.trim().toLowerCase() === opts.initialSize.trim().toLowerCase()) {
+                        btn.click();
+                    }
+                });
+
+                if (!selectedSize && normSizes.length > 0) {
+                    const first = modalSizeOptions.querySelector('button.size-option');
+                    if (first) first.click();
+                }
+            } else {
+                modalSizeSection.classList.add('hidden');
+                selectedSize = opts.initialSize || 'N/A';
+            }
+
+            // render colors
+            if (hasColors && normColors.length > 0) {
+                modalColorSection.classList.remove('hidden');
+                modalColorOptions.innerHTML = '';
+                normColors.forEach(c => {
+                    const btn = createOptionButton(c.name, 'color');
+                    btn.dataset.color = c.name;
+                    btn.style.minWidth = '64px';
+                    btn.addEventListener('click', function() {
+                        modalColorOptions.querySelectorAll('.color-option').forEach(b => b.classList.remove('bg-pink-600','text-white'));
+                        this.classList.add('bg-pink-600','text-white');
+                        selectedColor = this.dataset.color;
+                        addToCartFromModalBtn.disabled = false;
+                    });
+                    modalColorOptions.appendChild(btn);
+
+                    if (opts.initialColor && c.name.trim().toLowerCase() === opts.initialColor.trim().toLowerCase()) {
+                        btn.click();
+                    }
+                });
+
+                if (!selectedColor && normColors.length > 0) {
+                    const firstC = modalColorOptions.querySelector('button.color-option');
+                    if (firstC) firstC.click();
+                }
+            } else {
+                modalColorSection.classList.add('hidden');
+                selectedColor = opts.initialColor || 'N/A';
+            }
+
+            modal.classList.remove('hidden');
+            addToCartFromModalBtn.disabled = !( (!hasSizes || selectedSize) && (!hasColors || selectedColor) );
+        })
+        .catch(err => {
+            console.error("Error opening modal options:", err);
+            modalErrorMessage.textContent = "Error loading options. You may still try adding to cart.";
+            modalErrorMessage.classList.remove('hidden');
+            modal.classList.remove('hidden');
+        });
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        resetModal();
+    }
+
+    // --- Event handlers (single delegated listener) ---
+    document.body.addEventListener('click', async (e) => {
+        // Move to Cart button
+        const moveBtn = e.target.closest('.add-to-cart-from-wishlist-btn');
+        if (moveBtn) {
+            lastClickedWishlistBtn = moveBtn;
+            const productId = moveBtn.dataset.productId;
+            const productName = moveBtn.dataset.productName || '';
+            const initialSize = (moveBtn.dataset.size && moveBtn.dataset.size !== 'N/A') ? moveBtn.dataset.size : null;
+            const initialColor = (moveBtn.dataset.color && moveBtn.dataset.color !== 'N/A') ? moveBtn.dataset.color : null;
+            const inferredHasSizes = moveBtn.dataset.hasSizes === 'true';
+            const inferredHasColors = moveBtn.dataset.hasColors === 'true';
+
+            openModal({
+                productId,
+                productName,
+                initialSize,
+                initialColor,
+                inferredHasSizes,
+                inferredHasColors
+            });
+            return;
+        }
+
+        // Remove from wishlist button
+        const removeBtn = e.target.closest('.remove-from-wishlist-btn');
+        if (removeBtn) {
+            const productId = removeBtn.dataset.productId;
+            if (!productId) {
+                console.error('Missing product id on remove btn');
+                return;
+            }
+            if (!confirm('Are you sure you want to remove this item from your wishlist?')) return;
+            await removeItemFromWishlist(productId, removeBtn);
+            return;
+        }
+
+        // Modal close
+        if (e.target === closeModalBtn || e.target.closest('#close-modal')) {
+            closeModal();
+            return;
+        }
+    });
+
+    // --- removeItemFromWishlist (async) ---
+    async function removeItemFromWishlist(productId, buttonElement) {
+        if (!csrfToken) { alert('CSRF token missing. Refresh page.'); return; }
+        buttonElement.disabled = true;
+        try {
+            const res = await fetch(`/toggle-wishlist/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({})
+            });
+
+            let data = {};
+            try { data = await res.json(); } catch (_) {}
+
+            if (!res.ok) {
+                throw new Error(data.message || `Failed to toggle wishlist (status ${res.status})`);
+            }
+
+            // REMOVAL LOGIC: Remove the card from the DOM
+            const card = buttonElement.closest('[data-wishlist-card]');
+            if (card) card.remove();
+            
+            // NEW LOGIC: Check if the list is now empty and display the message
+            const remainingCards = document.querySelectorAll('[data-wishlist-card]');
+            const container = document.querySelector('.space-y-4');
+            const wishlistCount = remainingCards.length;
+
+            document.querySelector('h3.font-bold').textContent = `Saved For Later (${wishlistCount})`;
+
+            if (wishlistCount === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 mt-8">
+                        <p>Your wishlist is empty! 🙁</p>
+                        <a href="{{ url_for('home') }}" class="inline-block mt-4 text-pink-600 hover:underline">Start adding products</a>
+                    </div>
+                `;
+            }
+
+            // NEW LOGIC: Update header counts
+            updateHeaderCounts({ wishlist_count: wishlistCount });
+            
+        } catch (err) {
+            console.error('Error removing wishlist item:', err);
+            alert(err.message || 'Failed to remove item from wishlist.');
+        } finally {
+            buttonElement.disabled = false;
+        }
+    }
+
+    // --- Add to cart from modal (async, robust) ---
+    addToCartFromModalBtn.addEventListener('click', async () => {
+        if (!csrfToken) { alert('CSRF token missing — refresh the page.'); return; }
+        // validations
+        if (hasSizes && (!selectedSize || selectedSize === 'N/A')) {
+            modalErrorMessage.textContent = 'Please select a size.'; modalErrorMessage.classList.remove('hidden'); return;
+        }
+        if (hasColors && (!selectedColor || selectedColor === 'N/A')) {
+            modalErrorMessage.textContent = 'Please select a color.'; modalErrorMessage.classList.remove('hidden'); return;
+        }
+
+        addToCartFromModalBtn.disabled = true;
+        modalErrorMessage.classList.add('hidden');
+
+        const payload = {
+            product_id: currentProductId,
+            quantity: 1,
+            size: selectedSize || 'N/A',
+            color: selectedColor || 'N/A'
+        };
+
+        try {
+            // 1) Add to cart
+            const addRes = await fetch('/add_to_cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(payload)
+            });
+
+            let addData = {};
+            try { addData = await addRes.json(); } catch (_) {}
+
+            if (!addRes.ok || !addData.success) {
+                throw new Error(addData.message || `Add to cart failed (status ${addRes.status})`);
+            }
+
+            // 2) Toggle wishlist server-side (best-effort)
+            let toggleData = {};
+            try {
+                const toggleRes = await fetch(`/toggle-wishlist/${currentProductId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({})
+                });
+                try { toggleData = await toggleRes.json(); } catch (_) {}
+                if (!toggleRes.ok) console.warn('Wishlist toggle returned non-ok', toggleRes.status, toggleData);
+            } catch (e) {
+                console.warn('Wishlist toggle network error', e);
+            }
+
+            // 3) REMOVAL LOGIC: Remove the wishlist card from DOM:
+            let removed = false;
+            if (lastClickedWishlistBtn) {
+                const card = lastClickedWishlistBtn.closest('[data-wishlist-card]');
+                if (card) { card.remove(); removed = true; }
+            }
+            if (!removed) {
+                // try to find card by product id
+                const card2 = findWishlistCardByProductId(currentProductId);
+                if (card2) card2.remove();
+            }
+
+            // NEW LOGIC: Update the main heading count
+            const remainingCards = document.querySelectorAll('[data-wishlist-card]');
+            const container = document.querySelector('.space-y-4');
+            const wishlistCount = remainingCards.length;
+
+            document.querySelector('h3.font-bold').textContent = `Saved For Later (${wishlistCount})`;
+
+            // NEW LOGIC: Display empty message if needed
+            if (wishlistCount === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 mt-8">
+                        <p>Your wishlist is empty! 🙁</p>
+                        <a href="{{ url_for('home') }}" class="inline-block mt-4 text-pink-600 hover:underline">Start adding products</a>
+                    </div>
+                `;
+            }
+
+            // 4) Update header counts if present
+            updateHeaderCounts(Object.assign({}, addData, toggleData, { wishlist_count: wishlistCount }));
+
+            closeModal();
+            // friendly message
+            alert(addData.message || 'Item added to cart.');
+            lastClickedWishlistBtn = null;
+
+        } catch (err) {
+            console.error('Add-to-cart workflow error:', err);
+            modalErrorMessage.textContent = err.message || 'Failed to add to cart.';
+            modalErrorMessage.classList.remove('hidden');
+        } finally {
+            addToCartFromModalBtn.disabled = false;
+        }
+    });
+
+    // close modal when clicking outside content
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    // keyboard ESC to close modal
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,229 @@
+{% extends 'admin/base.html' %} {# Assuming this is your base layout for admin panel #}
+
+{% block content %}
+<style>[x-cloak] { display: none !important; }</style>
+<div class="max-w-5xl mx-auto mt-10 p-8 bg-white rounded-2xl shadow-xl">
+    <h1 class="text-3xl font-bold text-center text-pink-600 mb-8">
+        {{ title }}
+    </h1>
+
+    {# Alpine.js for tab functionality. activeTab holds the currently selected tab's ID. #}
+    <div x-data="{ activeTab: 'general' }" class="mt-6">
+        <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <a @click.prevent="activeTab = 'general'" :class="{ 'border-pink-500 text-pink-600': activeTab === 'general', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'general' }"
+                   class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm cursor-pointer" href="#general">General</a>
+                <a @click.prevent="activeTab = 'social'" :class="{ 'border-pink-500 text-pink-600': activeTab === 'social', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'social' }"
+                   class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm cursor-pointer" href="#social">Social Media</a>
+                <a @click.prevent="activeTab = 'features'" :class="{ 'border-pink-500 text-pink-600': activeTab === 'features', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'features' }"
+                   class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm cursor-pointer" href="#features">Features</a>
+                <a @click.prevent="activeTab = 'ecommerce'" :class="{ 'border-pink-500 text-pink-600': activeTab === 'ecommerce', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'ecommerce' }"
+                   class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm cursor-pointer" href="#ecommerce">E-commerce</a>
+                <a @click.prevent="activeTab = 'seo'" :class="{ 'border-pink-500 text-pink-600': activeTab === 'seo', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'seo' }"
+                   class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm cursor-pointer" href="#seo">SEO & Analytics</a>
+                <a @click.prevent="activeTab = 'payment'" :class="{ 'border-pink-500 text-pink-600': activeTab === 'payment', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'payment' }"
+                   class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm cursor-pointer" href="#payment">Payment</a>
+            </nav>
+        </div>
+
+        <div class="mt-8">
+            {# General Settings Form #}
+            <div x-show="activeTab === 'general'" id="general" class="space-y-6">
+                <h2 class="text-xl font-semibold text-gray-800">General Site Information</h2>
+                <form method="post">
+                    {{ general_form.csrf_token }}
+                    <div>
+                        <label for="{{ general_form.site_name.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ general_form.site_name.label }}</label>
+                        {{ general_form.site_name(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in general_form.site_name.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ general_form.site_tagline.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ general_form.site_tagline.label }}</label>
+                        {{ general_form.site_tagline(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in general_form.site_tagline.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ general_form.contact_email.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ general_form.contact_email.label }}</label>
+                        {{ general_form.contact_email(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in general_form.contact_email.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ general_form.support_phone.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ general_form.support_phone.label }}</label>
+                        {{ general_form.support_phone(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in general_form.support_phone.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ general_form.address.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ general_form.address.label }}</label>
+                        {{ general_form.address(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in general_form.address.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                     <div>
+                        <label for="{{ general_form.logo_url.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ general_form.logo_url.label }}</label>
+                        {{ general_form.logo_url(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in general_form.logo_url.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        {# Note: The submit button name should match the one in your form class (e.g., submit_general) #}
+                        {{ general_form.submit_general(class="w-full inline-flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition duration-150 ease-in-out") }}
+                    </div>
+                </form>
+            </div>
+
+            {# Social Media Settings Form #}
+            {# Note: All tab content divs except the initial one should have `hidden` class #}
+            <div x-show="activeTab === 'social'" id="social" class="space-y-6 hidden">
+                <h2 class="text-xl font-semibold text-gray-800">Social Media Links</h2>
+                <form method="post">
+                    {{ social_form.csrf_token }}
+                    <div>
+                        <label for="{{ social_form.facebook_url.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ social_form.facebook_url.label }}</label>
+                        {{ social_form.facebook_url(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in social_form.facebook_url.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ social_form.instagram_url.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ social_form.instagram_url.label }}</label>
+                        {{ social_form.instagram_url(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in social_form.instagram_url.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ social_form.twitter_url.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ social_form.twitter_url.label }}</label>
+                        {{ social_form.twitter_url(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in social_form.twitter_url.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ social_form.pinterest_url.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ social_form.pinterest_url.label }}</label>
+                        {{ social_form.pinterest_url(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in social_form.pinterest_url.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        {{ social_form.submit_social(class="w-full inline-flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition duration-150 ease-in-out") }}
+                    </div>
+                </form>
+            </div>
+
+            {# Feature Toggles Form #}
+            <div x-show="activeTab === 'social'" id="social" class="space-y-6" x-cloak>
+                <h2 class="text-xl font-semibold text-gray-800">Feature Toggles & Operational Modes</h2>
+                <form method="post">
+                    {{ features_form.csrf_token }}
+                    <div class="flex items-center space-x-2">
+                        {{ features_form.maintenance_mode(class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded") }}
+                        <label for="{{ features_form.maintenance_mode.id }}" class="text-sm font-medium text-gray-700">{{ features_form.maintenance_mode.label }}</label>
+                        {% for error in features_form.maintenance_mode.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        {{ features_form.new_user_registration_enabled(class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded") }}
+                        <label for="{{ features_form.new_user_registration_enabled.id }}" class="text-sm font-medium text-gray-700">{{ features_form.new_user_registration_enabled.label }}</label>
+                        {% for error in features_form.new_user_registration_enabled.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        {{ features_form.reviews_enabled(class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded") }}
+                        <label for="{{ features_form.reviews_enabled.id }}" class="text-sm font-medium text-gray-700">{{ features_form.reviews_enabled.label }}</label>
+                        {% for error in features_form.reviews_enabled.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        {{ features_form.guest_checkout_enabled(class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded") }}
+                        <label for="{{ features_form.guest_checkout_enabled.id }}" class="text-sm font-medium text-gray-700">{{ features_form.guest_checkout_enabled.label }}</label>
+                        {% for error in features_form.guest_checkout_enabled.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        {{ features_form.submit_features(class="w-full inline-flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition duration-150 ease-in-out") }}
+                    </div>
+                </form>
+            </div>
+
+            {# E-commerce Specific Settings Form #}
+            <div x-show="activeTab === 'ecommerce'" id="ecommerce" class="space-y-6 hidden">
+                <h2 class="text-xl font-semibold text-gray-800">E-commerce Specific Settings</h2>
+                <form method="post">
+                    {{ ecommerce_form.csrf_token }}
+                    <div>
+                        <label for="{{ ecommerce_form.items_per_page_catalog.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ ecommerce_form.items_per_page_catalog.label }}</label>
+                        {{ ecommerce_form.items_per_page_catalog(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in ecommerce_form.items_per_page_catalog.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ ecommerce_form.default_currency.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ ecommerce_form.default_currency.label }}</label>
+                        {{ ecommerce_form.default_currency(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in ecommerce_form.default_currency.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ ecommerce_form.shipping_cost_flat_rate.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ ecommerce_form.shipping_cost_flat_rate.label }}</label>
+                        {{ ecommerce_form.shipping_cost_flat_rate(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in ecommerce_form.shipping_cost_flat_rate.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ ecommerce_form.free_shipping_min_order_amount.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ ecommerce_form.free_shipping_min_order_amount.label }}</label>
+                        {{ ecommerce_form.free_shipping_min_order_amount(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in ecommerce_form.free_shipping_min_order_amount.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ ecommerce_form.tax_rate_percentage.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ ecommerce_form.tax_rate_percentage.label }}</label>
+                        {{ ecommerce_form.tax_rate_percentage(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in ecommerce_form.tax_rate_percentage.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ ecommerce_form.order_confirmation_email_sender.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ ecommerce_form.order_confirmation_email_sender.label }}</label>
+                        {{ ecommerce_form.order_confirmation_email_sender(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in ecommerce_form.order_confirmation_email_sender.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        {{ ecommerce_form.submit_ecommerce(class="w-full inline-flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition duration-150 ease-in-out") }}
+                    </div>
+                </form>
+            </div>
+
+            {# SEO & Analytics Settings Form #}
+            <div x-show="activeTab === 'seo'" id="seo" class="space-y-6 hidden">
+                <h2 class="text-xl font-semibold text-gray-800">SEO & Analytics Settings</h2>
+                <form method="post">
+                    {{ seo_form.csrf_token }}
+                    <div>
+                        <label for="{{ seo_form.default_meta_description.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ seo_form.default_meta_description.label }}</label>
+                        {{ seo_form.default_meta_description(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in seo_form.default_meta_description.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ seo_form.default_meta_keywords.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ seo_form.default_meta_keywords.label }}</label>
+                        {{ seo_form.default_meta_keywords(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in seo_form.default_meta_keywords.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ seo_form.google_analytics_id.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ seo_form.google_analytics_id.label }}</label>
+                        {{ seo_form.google_analytics_id(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in seo_form.google_analytics_id.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        {{ seo_form.submit_seo(class="w-full inline-flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition duration-150 ease-in-out") }}
+                    </div>
+                </form>
+            </div>
+
+            {# Payment Gateway Settings Form #}
+            <div x-show="activeTab === 'payment'" id="payment" class="space-y-6 hidden">
+                <h2 class="text-xl font-semibold text-gray-800">Payment Gateway Settings</h2>
+                <form method="post">
+                    {{ payment_form.csrf_token }}
+                    <div>
+                        <label for="{{ payment_form.razorpay_key.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ payment_form.razorpay_key.label }}</label>
+                        {{ payment_form.razorpay_key(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in payment_form.razorpay_key.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ payment_form.razorpay_secret.id }}" class="block text-sm font-medium text-gray-700 mb-1">{{ payment_form.razorpay_secret.label }}</label>
+                        {{ payment_form.razorpay_secret(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 px-3 py-2") }}
+                        {% for error in payment_form.razorpay_secret.errors %}<p class="text-red-500 text-xs mt-1">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        {{ payment_form.submit_payment(class="w-full inline-flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition duration-150 ease-in-out") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Include Alpine.js for tab functionality #}
+
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+{% endblock %}

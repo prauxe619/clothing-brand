@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Admin{% endblock %}
+
+{% block content %}
+<div class="p-6 max-w-xl mx-auto bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">{{ action }} Admin</h2>
+    <form method="POST" class="space-y-6">
+        {{ form.hidden_tag() }}
+        
+        <div class="mb-4">
+            {{ form.email.label(class="block text-sm font-medium text-gray-700") }}
+            {{ form.email(class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+        </div>
+        <div class="mb-4">
+            {{ form.username.label(class="block text-sm font-medium text-gray-700") }}
+            {{ form.username(class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+        </div>
+        
+        <div class="mb-4">
+            {{ form.role.label(class="block text-sm font-medium text-gray-700") }}
+            <select name="role" id="role" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <option value="user" {% if form.role.data == 'user' %}selected{% endif %}>User</option>
+                <option value="staff" {% if form.role.data == 'staff' %}selected{% endif %}>Staff</option>
+                <option value="admin" {% if form.role.data == 'admin' %}selected{% endif %}>Admin</option>
+                <option value="superadmin" {% if form.role.data == 'superadmin' %}selected{% endif %}>Super Admin</option>
+            </select>
+        </div>
+
+        {# ADDED PASSWORD FIELDS HERE #}
+        <div class="mb-4">
+            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="password" name="password" 
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        </div>
+        
+        <div class="mb-4">
+            <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <input type="password" id="confirm_password" name="confirm_password"
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        </div>
+        
+        <div>
+            {{ form.submit(class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

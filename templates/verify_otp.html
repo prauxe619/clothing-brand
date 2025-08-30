@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Verify OTP{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center bg-white py-8 px-4">
+    <div class="w-full max-w-sm bg-white shadow-xl rounded-2xl p-8">
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Verify OTP</h2>
+
+        {% if mobile %}
+        <p class="text-center text-gray-600 mb-4">A verification code has been sent to: <strong class="text-pink-600">{{ mobile }}</strong></p>
+        {% else %}
+        <p class="text-center text-gray-600 mb-4">Please enter the verification code sent to your mobile.</p>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('verify_otp') }}" class="space-y-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="mobile" value="{{ mobile }}" /> {# Pass mobile number silently #}
+
+            <div>
+                <label for="otp" class="block text-sm font-medium text-gray-700">Enter OTP</label>
+                <input type="text" name="otp" id="otp" required maxlength="6"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 text-sm py-2 px-3" />
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 rounded-md transition">
+                Verify Code
+            </button>
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="mt-4 space-y-2">
+              {% for category, msg in messages %}
+                <li class="p-2 rounded-md text-sm
+                    {% if category == 'error' %} bg-red-100 text-red-700
+                    {% elif category == 'success' %} bg-green-100 text-green-700
+                    {% else %} bg-gray-100 text-gray-700 {% endif %}">
+                  {{ msg }}
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <p class="mt-6 text-center text-sm text-gray-500">
+            Didn't receive a code? <a href="{{ url_for('forgot_password') }}" class="text-pink-600 hover:underline">Resend code</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

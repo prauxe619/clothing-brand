@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <!-- Tailwind CSS -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md">
+      <div class="p-4 border-b">
+        <h1 class="text-xl font-bold">Admin Panel</h1>
+      </div>
+      <nav class="p-4 space-y-2">
+        
+        {# --- NEW: Back to Home Button --- #}
+        <a href="{{ url_for('home') }}" 
+           class="block px-3 py-2 rounded text-white bg-pink-600 hover:bg-pink-700 font-medium mb-4 text-center">
+          Back to Home
+        </a>
+        {# --- END NEW --- #}
+        <a href="{{ url_for('admin.upload_csv') }}" class="block px-3 py-2 rounded hover:bg-gray-200">Upload Products (CSV)</a> 
+        <a href="{{ url_for('admin.dashboard') }}" class="block px-3 py-2 rounded hover:bg-gray-200">🧱 Admin Wall</a>
+        <a href="{{ url_for('admin.users') }}" class="block px-3 py-2 rounded hover:bg-gray-200">User Management</a>
+        <a href="{{ url_for('admin_products') }}" class="block px-3 py-2 rounded hover:bg-gray-200">Products</a> {# Added Products link #}
+        <a href="{{ url_for('admin.analytic_settings') }}" class="block px-3 py-2 rounded hover:bg-gray-200">Settings</a>
+        {% if current_user.role == 'superadmin' %}
+        <a href="{{ url_for('admin.manage_admins') }}" class="block px-3 py-2 rounded hover:bg-gray-200">Manage Admins</a>
+        {% endif %}
+        <a href="{{ url_for('admin.activity_logs') }}" class="block px-3 py-2 rounded hover:bg-gray-200">Activity Logs</a>
+        <a href="{{ url_for('admin.user_activity') }}" class="block px-3 py-2 rounded hover:bg-gray-200">User Activity Logs</a>
+        <a href="{{ url_for('admin.admin_forecast') }}" class="block px-3 py-2 rounded hover:bg-gray-200">Sales Forecast</a>
+        <a href="{{ url_for('admin.manage_banners') }}" class="block px-3 py-2 rounded hover:bg-gray-200">Banners</a> 
+        <a href="{{ url_for('admin.theme_settings') }}" class="block px-3 py-2 rounded hover:bg-gray-200">Theme Settings</a>
+        <a href="{{ url_for('admin.click_report') }}" class="block px-3 py-2 rounded hover:bg-gray-200">View Click Report</a>
+        <a href="{{ url_for('logout') }}" class="block px-3 py-2 rounded hover:bg-gray-200 text-red-600">Logout</a>
+        
+    </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="mb-2 p-2 rounded {{ 'bg-green-200' if category=='success' else 'bg-red-200' }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+    <main class="flex-1 p-6">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="mb-4 space-y-2">
+            {% for category, message in messages %}
+              {# Improved flash message styling to use full Tailwind classes #}
+              <div class="p-3 rounded 
+                  {% if category == 'success' %} bg-green-100 text-green-800
+                  {% elif category == 'error' or category == 'danger' %} bg-red-100 text-red-800
+                  {% elif category == 'warning' %} bg-yellow-100 text-yellow-800
+                  {% else %} bg-blue-100 text-blue-800
+                  {% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      
+      
+    </main>
+  </div>
+  
+   <script>
+        // Use a conditional check to ensure the element exists before trying to add an event listener
+        const someElement = document.getElementById('some-element-id');
+        if (someElement) {
+            someElement.addEventListener('click', function() {
+                // Your script logic here
+            });
+        }
+    </script>
+</body>
+</html>

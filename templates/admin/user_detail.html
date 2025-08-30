@@ -1,0 +1,44 @@
+{% extends 'admin/base.html' %}
+{% block title %}User Details{% endblock %}
+
+{% block content %}
+<div class="p-4">
+  <h2 class="text-2xl font-semibold mb-4">User Details</h2>
+
+  <div class="bg-white shadow rounded-lg p-6">
+    <p><strong>ID:</strong> {{ user.id }}</p>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Role:</strong> {{ user.role }}</p>
+    <p><strong>Banned:</strong> {{ 'Yes' if user.is_banned else 'No' }}</p>
+    <p><strong>Joined:</strong> {{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'N/A' }}</p>
+  </div>
+
+  <div class="mt-6 flex gap-4">
+    {% if user.role != 'admin' %}
+    <form method="post" action="{{ url_for('admin.promote_user', user_id=user.id) }}">
+      {{ csrf_token() }}
+      <button class="bg-blue-600 text-white px-4 py-2 rounded" type="submit">Promote to Admin</button>
+    </form>
+    {% else %}
+    <form method="post" action="{{ url_for('admin.demote_user', user_id=user.id) }}">
+      <button class="bg-yellow-500 text-white px-4 py-2 rounded" type="submit">Demote to User</button>
+    </form>
+    {% endif %}
+
+    {% if not user.is_banned %}
+    <form method="post" action="{{ url_for('admin.ban_user', user_id=user.id) }}">
+      <button class="bg-red-600 text-white px-4 py-2 rounded" type="submit">Ban User</button>
+    </form>
+    {% else %}
+    <form method="post" action="{{ url_for('admin.unban_user', user_id=user.id) }}">
+      <button class="bg-green-600 text-white px-4 py-2 rounded" type="submit">Unban User</button>
+    </form>
+    {% endif %}
+  </div>
+
+  <div class="mt-6">
+    <a href="{{ url_for('admin.user') }}" class="text-blue-600">← Back to User List</a>
+  </div>
+</div>
+{% endblock %}

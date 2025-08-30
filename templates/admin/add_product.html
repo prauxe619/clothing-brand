@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <h2 class="text-2xl font-bold mb-6">Add New Product</h2>
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-4">
+        {{ form.csrf_token }}
+
+        <div>
+            {{ form.name.label(class="block font-medium text-gray-700") }}
+            {{ form.name(class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+            {% if form.name.errors %}
+                <ul class="text-red-500 text-sm mt-1">{% for error in form.name.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.price.label(class="block font-medium text-gray-700") }}
+            {{ form.price(class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+            {% if form.price.errors %}
+                <ul class="text-red-500 text-sm mt-1">{% for error in form.price.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.category.label(class="block font-medium text-gray-700") }}
+            {{ form.category(class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+            {% if form.category.errors %}
+                <ul class="text-red-500 text-sm mt-1">{% for error in form.category.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        {# --- Sizes and Inventory Section --- #}
+        <div class="border p-4 rounded-md bg-gray-50">
+            <label class="block font-medium text-gray-700 mb-2">Sizes & Inventory:</label>
+            <div class="flex items-center mt-2">
+                <select id="sizeInput" class="flex-grow px-3 py-2 border border-gray-300 rounded-md shadow-sm mr-2">
+                    <option value="" disabled selected>Select a size</option>
+                    {% for size in ALL_SIZES %}
+                        <option value="{{ size.id }}">{{ size.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" onclick="addSize()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md shadow-sm transition duration-150 ease-in-out">
+                    Add Size
+                </button>
+            </div>
+            <div id="sizeList" class="mt-4 flex flex-wrap gap-2"></div>
+
+            <h4 class="mt-6 text-lg font-semibold text-gray-800">Inventory per Size:</h4>
+            <div id="inventoryGrid" class="mt-2 overflow-x-auto"></div>
+        </div>
+
+        <div>
+            {{ form.description.label(class="block font-medium text-gray-700") }}
+            {{ form.description(class="mt-1 block w-full px-3 py-2 h-32 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+            {% if form.description.errors %}
+                <ul class="text-red-500 text-sm mt-1">{% for error in form.description.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        {# --- Main Image --- #}
+        <div>
+            {{ form.main_image.label(class="block font-medium text-gray-700") }}
+            {{ form.main_image(class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none") }}
+            {% if form.main_image.errors %}
+                <ul class="text-red-500 text-sm mt-1">{% for error in form.main_image.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        {# --- Additional Images --- #}
+        <div>
+            {{ form.additional_images.label(class="block font-medium text-gray-700") }}
+            {{ form.additional_images(class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none", multiple=true) }}
+            {% if form.additional_images.errors %}
+                <ul class="text-red-500 text-sm mt-1">{% for error in form.additional_images.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+        </div>
+
+        {# --- Colors Section --- #}
+        <div class="border p-4 rounded-md bg-gray-50">
+            <label class="block font-medium text-gray-700 mb-2">Colors:</label>
+            <div class="flex items-center mt-2">
+                <input type="color" id="colorPicker" class="w-12 h-10 border border-gray-300 rounded-md shadow-sm mr-2" />
+                <button type="button" onclick="addColor()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md shadow-sm transition duration-150 ease-in-out">Add Color</button>
+            </div>
+            <div id="colorList" class="mt-4 flex flex-wrap gap-2"></div>
+        </div>
+
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md shadow-sm transition duration-150 ease-in-out">
+            Add Product
+        </button>
+    </form>
+</div>
+
+<script>
+const sizes = new Map(); // Store sizeId => sizeName
+const quantities = {};
+const colors = new Set();
+
+function addSize() {
+    const select = document.getElementById('sizeInput');
+    const sizeId = select.value;
+    const sizeName = select.options[select.selectedIndex].text;
+
+    if (!sizeId) return;
+
+    if (!sizes.has(sizeId)) {
+        sizes.set(sizeId, sizeName);
+        quantities[sizeId] = 0;
+        renderSizes();
+        renderInventoryGrid();
+    }
+    select.value = "";
+}
+
+function renderSizes() {
+    const container = document.getElementById('sizeList');
+    container.innerHTML = '';
+    sizes.forEach((name, id) => {
+        const tag = document.createElement('span');
+        tag.textContent = name + ' ×';
+        tag.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 cursor-pointer hover:bg-gray-200';
+        tag.onclick = () => {
+            sizes.delete(id);
+            delete quantities[id];
+            renderSizes();
+            renderInventoryGrid();
+        };
+        container.appendChild(tag);
+    });
+}
+
+function renderInventoryGrid() {
+    const container = document.getElementById('inventoryGrid');
+    container.innerHTML = '';
+    if (sizes.size === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-sm">Add at least one size to set inventory.</p>';
+        return;
+    }
+
+    const table = document.createElement('table');
+    table.className = 'min-w-full divide-y divide-gray-200 shadow-sm rounded-lg overflow-hidden';
+
+    const header = document.createElement('thead');
+    header.className = 'bg-gray-100';
+    header.innerHTML = `<tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+    </tr>`;
+    table.appendChild(header);
+
+    const tbody = document.createElement('tbody');
+    tbody.className = 'bg-white divide-y divide-gray-200';
+
+    sizes.forEach((name, id) => {
+        const tr = document.createElement('tr');
+        const tdSize = document.createElement('td');
+        tdSize.textContent = name;
+        tdSize.className = 'px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900';
+        tr.appendChild(tdSize);
+
+        const tdQty = document.createElement('td');
+        tdQty.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500';
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.min = 0;
+        input.value = quantities[id] || 0;
+        input.className = 'border border-gray-300 rounded-md px-2 py-1 w-24 text-center focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm';
+        input.oninput = () => quantities[id] = parseInt(input.value) || 0;
+        tdQty.appendChild(input);
+        tr.appendChild(tdQty);
+
+        tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    container.appendChild(table);
+}
+
+function addColor() {
+    const colorPicker = document.getElementById('colorPicker');
+    const color = colorPicker.value.toUpperCase();
+    if (color && !colors.has(color)) {
+        colors.add(color);
+        renderColors();
+    }
+}
+
+function renderColors() {
+    const container = document.getElementById('colorList');
+    container.innerHTML = '';
+    colors.forEach(color => {
+        const tag = document.createElement('span');
+        tag.style.backgroundColor = color;
+        tag.className = 'w-8 h-8 rounded-full border-2 border-gray-300 shadow-sm cursor-pointer inline-block transform transition duration-150 ease-in-out hover:scale-110';
+        tag.title = color;
+        tag.onclick = () => { colors.delete(color); renderColors(); };
+        container.appendChild(tag);
+    });
+}
+
+// Pack hidden inputs on form submit
+document.querySelector('form').addEventListener('submit', function() {
+    document.getElementById('hiddenSizes')?.remove();
+    document.getElementById('hiddenQuantities')?.remove();
+    document.getElementById('hiddenColors')?.remove();
+
+    const sizesInput = document.createElement('input');
+    sizesInput.type = 'hidden';
+    sizesInput.name = 'sizes[]';
+    sizesInput.value = Array.from(sizes.keys());
+    sizesInput.id = 'hiddenSizes';
+    this.appendChild(sizesInput);
+
+    const quantitiesInput = document.createElement('input');
+    quantitiesInput.type = 'hidden';
+    quantitiesInput.name = 'quantities[]';
+    quantitiesInput.value = JSON.stringify(quantities);
+    quantitiesInput.id = 'hiddenQuantities';
+    this.appendChild(quantitiesInput);
+
+    const colorsInput = document.createElement('input');
+    colorsInput.type = 'hidden';
+    colorsInput.name = 'colors';
+    colorsInput.value = Array.from(colors).join(',');
+    colorsInput.id = 'hiddenColors';
+    this.appendChild(colorsInput);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderSizes();
+    renderInventoryGrid();
+    renderColors();
+});
+</script>
+{% endblock %}

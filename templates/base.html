@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+     <link rel="icon" href="{{ url_for('static', filename='favicon/favicon.ico') }}" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://checkout.razorpay.com https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.clarity.ms 'unsafe-inline';">
+    <meta name="description" content="PRAUXE — Explore premium fashion for Men, Women, and Kids. Discover new arrivals, deals, and style essentials." />
+    <meta name="keywords" content="PRAUXE, Clothing, Fashion, Men, Women, Kids, Online Shopping" />
+    <meta name="author" content="PRAUXE" />
+    <title>{% block title %} PRAUXE | Premium Fashion{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    {# --- CRITICAL: Font Awesome CDN Link --- #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" xintegrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0V4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    {# --- CRITICAL: CSRF Token Meta Tag --- #}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZH4M6FT82E"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ZH4M6FT82E');
+</script>
+
+    <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "snjrzta2ur");
+    </script>
+    <!-- Swiper CSS -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        xintegrity="sha512-papbCWZp49klz... (use latest integrity hash)"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        /* Custom class for the brand name to adjust font size responsively */
+        .brand-name {
+            font-size: 3rem; /* Default for larger screens */
+            /* New: Apply luxury font and text gradient */
+            font-family: 'weight: bold, Playfair Display', serif;
+            background: linear-gradient(to right, #e22c0c, #bb0e79, #c41610); /* Gold/Bronze Gradient */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent; /* Fallback for browsers that don't support text-fill-color */
+        }
+        @media (max-width: 768px) { /* Adjust for medium screens and smaller */
+            .brand-name {
+                font-size: 2rem;
+            }
+        }
+        @media (max-width: 480px) { /* Adjust for small screens (mobile) */
+            .brand-name {
+                font-size: 1.5rem;
+            }
+        }
+        /* Ensure consistent height for all main icons to aid alignment */
+        .main-header-icon {
+            width: 1.5rem; /* Equivalent to w-6 */
+            height: 1.5rem; /* Equivalent to h-6 */
+            display: flex; /* Make them flex containers */
+            align-items: center; /* Center content vertically */
+            justify-content: center; /* Center content horizontally */
+        }
+        /* Adjust the small gradient span for a luxury look */
+        .luxury-gradient-span {
+            background: linear-gradient(to right, #5a5a5a 0%, #ffffff 50%, #b8860b 100%); /* Grey, White, Gold */
+        }
+    </style>
+
+    <style>
+        :root {
+            --primary-color: {{ primary_color }};
+            --background-color: {{ background_color }};
+            --font-family: {{ font_family }};
+        }
+
+        body {
+            background-color: var(--background-color);
+            font-family: var(--font-family);
+        }
+
+        a > i:hover,
+        a > svg:hover {
+            background-color: transparent !important;
+        }
+
+        /* --- Microphone icon CSS --- */
+        .mic-icon {
+            position: relative;
+            width: 12px;
+            height: 16px;
+            background: #5f6368;
+            border-radius: 6px 6px 0 0;
+            display: block;
+        }
+
+        .mic-icon::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 6px;
+            background: #5f6368;
+        }
+
+        /* Styles for the recording indicator */
+        .mic-icon.recording {
+            animation: pulse 1s infinite alternate; /* Simple pulse animation */
+            background-color: #ef4444; /* Red color when recording */
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        /* Modal for messages - replacing alert() */
+        .message-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .message-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .message-modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+            position: relative;
+        }
+
+        .message-modal-content button {
+            margin-top: 15px;
+            padding: 8px 15px;
+            background-color: #ef4444; /* Red for error, adjust as needed */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+    {% if settings.custom_css_file %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='themes/' + site_settings.custom_css_file) }}">
+    {% endif %}
+
+</head>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="fixed top-5 right-5 space-y-2 z-50">
+            {% for category, message in messages %}
+                <div
+                    class="px-4 py-2 rounded shadow
+                    {% if category == 'success' %}
+                        bg-green-100 text-green-800
+                    {% elif category == 'danger' %}
+                        bg-red-100 text-red-800
+                    {% else %}
+                        bg-gray-100 text-gray-800
+                    {% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<!-- Message Modal HTML -->
+<div id="messageModal" class="message-modal-overlay">
+    <div class="message-modal-content">
+        <p id="modalMessage"></p>
+        <button id="modalCloseButton">OK</button>
+    </div>
+</div>
+
+<div id="exitIntentModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-[9999] hidden opacity-0 transition-opacity duration-300 ease-out">
+    <div class="bg-white rounded-xl shadow-xl w-[90%] max-w-lg relative p-6 animate-fade-in-up">
+        
+        <button id="exitModalClose" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl leading-none">
+            &times;
+        </button>
+
+        <div class="flex justify-center mb-4">
+            <img src="{{ url_for('static', filename='images/cart-exit.png') }}" alt="Cart Illustration" class="w-28 h-28">
+        </div>
+
+        <h2 class="text-2xl font-extrabold text-gray-900 mb-2 text-center tracking-tight">
+            Wait! 🛍️ You forgot your cart
+        </h2>
+
+        <p class="text-gray-600 mb-6 text-center">
+            You have items waiting in your bag. Complete your purchase before they go out of stock!
+        </p>
+
+        <div class="flex justify-center">
+            <a href="/cart" class="px-6 py-3 bg-pink-600 bg-[var(--primary-color)] hover:brightness-90 text-white font-semibold rounded-lg transition">
+                Go to Cart
+            </a>
+        </div>
+    </div>
+</div>
+
+<body class="bg-white text-gray-900">
+
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-md border-b">
+    <div class="flex items-center justify-between px-3 py-3 md:py-4">
+    {# Desktop Search Form (hidden on mobile) #}
+   <form id="searchForm" action="/search" method="GET"
+      class="hidden md:flex items-center w-60 h-10 bg-white rounded-full border border-black-300 shadow-sm focus-within:ring-1 focus-within:ring-black-400 px-2">
+  
+  <!-- Text Input -->
+  <input 
+    id="searchInputDesktop" 
+    type="text" 
+    name="q" 
+    placeholder="Search..."
+    class="flex-grow px-3 text-sm text-gray-700 bg-transparent focus:outline-none"
+  />
+
+  <!-- Mic Button Only -->
+  <button 
+    type="button" 
+    onclick="startVoiceSearch('searchInputDesktop', 'micIconDesktop')"
+    class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+  >
+    <i id="micIconDesktop" class="fas fa-microphone text-gray-600 text-base"></i>
+  </button>
+</form>
+<!-- Mobile Mic Button (only on mobile) -->
+
+
+
+        <button id="openSidebar" class="text-2xl text-grey-700 md:hidden">
+            ☰
+        </button>
+
+        <a href="/" class="brand-name font-bold tracking-widest text-gray-900 text-xl md:text-2xl absolute left-1/2 transform -translate-x-1/2 select-none">
+            PRAUXE
+            <span class="inline-block mx-1 w-5 h-3 bg-[linear-gradient(to_right,#00205B_0%,#FFFFFF_50%,#E3002D_100%)] rounded-sm"></span>
+        </a>
+
+        <div class="flex items-center space-x-4">
+            
+            {% if current_user.is_authenticated and current_user.role in ['admin', 'superadmin'] %}
+                <a href="{{ url_for('admin.list_subscribers_admin') }}" 
+                 class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm font-semibold whitespace-nowrap hidden md:block">
+                 Newsletter Subscribers
+                </a>
+                <a href="{{ url_for('admin.analytic_settings') }}"
+                   class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-200 text-sm font-semibold whitespace-nowrap hidden md:block">
+                    Admin Settings
+                </a>
+            {% endif %}
+
+            <a href="/wishlist" class="flex flex-col items-center text-gray-700 hover:text-pink-500" aria-label="Wishlist">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+       
+    </a>
+
+            <a href="/cart" class="relative flex flex-col items-center text-gray-700 hover:text-black" aria-label="Bag">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
+    <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+        1
+    </span>
+</a>
+            
+            {% if current_user.is_authenticated %}
+        {# MOBILE USER PROFILE ICON (Visible on Mobile, Hidden on Desktop) #}
+        <a href="{{ url_for('user_dashboard') }}" aria-label="User Profile" class="text-gray-700 hover:text-pink-500 md:hidden">
+            <i class="far fa-user-circle text-lg md:text-xl"></i>
+        </a>
+        
+        {# DESKTOP USER PROFILE LINKS (Hidden on Mobile, Visible on Desktop) #}
+        <div class="hidden md:flex items-center space-x-2">
+            {% if current_user.is_admin %}
+                <a href="{{ url_for('admin_dashboard') }}" class="text-indigo-600 hover:underline whitespace-nowrap">
+                    Hi, {{ current_user.first_name }} (Admin)
+                </a>
+                <a href="{{ url_for('logout') }}" class="text-gray-400 hover:underline whitespace-nowrap">
+                    Logout
+                </a>
+            {% else %}
+                <a href="{{ url_for('user_dashboard') }}" class="text-gray-700 hover:underline whitespace-nowrap">
+                    Hi, {{ current_user.username }}
+                </a>
+            {% endif %}
+        </div>
+    {% else %}
+        {# Login/Signup links for desktop only #}
+        <a href="{{ url_for('login') }}" class="hidden md:inline text-gray-700 hover:underline whitespace-nowrap">
+            Login
+        </a>
+        
+    {% endif %}
+    
+        </div>
+    </div>
+
+    <nav class="hidden md:flex justify-center space-x-12 text-sm font-bold text-grey-400 border-t border-b py-2 bg-white">
+        <a href="/men" class="hover:text-[var(--primary-color)]">MEN</a>
+        <a href="/women" class="hover:text-pink-600">WOMEN</a>
+        <a href="/new-arrivals" class="hover:text-pink-600">NEW ARRIVALS</a>
+        <a href="/bestsellers" class="hover:text-pink-600">BEST SELLER</a>
+        <a href="/sale" class="hover:text-pink-600">SALE</a>
+        <a href="/deal-of-the-day" class="hover:text-pink-600">DEAL OF THE DAY</a>
+    </nav>
+
+        <div id="sidebar" 
+                class="fixed top-0 left-0 h-full w-72 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 z-50">
+            <div class="flex justify-between items-center p-4 border-b">
+                <span class="font-bold text-lg">Menu</span>
+                <button id="closeSidebar" class="text-3xl font-bold text-pink-600">&times;</button>
+            </div>
+            <ul class="p-4 space-y-4 text-black font-semibold">
+                <li><a href="/new-arrivals" class="hover:text-pink-500">New Arrivals</a></li>
+                <li><a href="#" class="hover:text-pink-500">Bestsellers</a></li>
+                <li><a href="#" class="hover:text-pink-500">Sale</a></li>
+                <li><a href="#" class="hover:text-pink-500">Deal of the Day</a></li>
+                <li><a href="#" class="hover:text-pink-500">Shop</a></li>
+                <li><a href="#" class="hover:text-pink-500">Luxury</a></li>
+                <li><a href="#" class="hover:text-pink-500">PRAUXE Plus</a></li>
+                <li><a href="/orders" class="hover:text-pink-500">Orders</a></li>
+                <li><a href="/stores" class="hover:text-pink-500">Stores Near Me</a></li>
+                {# Add admin links to sidebar for mobile if current_user is admin #}
+                {% if current_user.is_authenticated and current_user.is_admin %}
+                    <li class="border-t pt-4 mt-4"><span class="font-bold text-gray-700">Admin Options</span></li>
+                    <li><a href="{{ url_for('admin.upload_csv') }}" class="hover:text-pink-500">⬆️ Bulk Upload</a></li>
+                    <li><a href="{{ url_for('admin.users') }}" class="hover:text-pink-500">👤 User Management</a></li>
+                    <li><a href="{{ url_for('admin.dashboard') }}" class="hover:text-pink-500">📊 Admin Dashboard</a></li>
+                {% endif %}
+                {# Always add logout to sidebar if authenticated #}
+                {% if current_user.is_authenticated %}
+                    <li class="border-t pt-4 mt-4">
+                        <a href="{{ url_for('logout') }}" class="text-pink-600 hover:underline">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="border-t pt-4 mt-4">
+                        <a href="{{ url_for('login') }}" class="hover:text-pink-500">Login</a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('signup') }}" class="hover:text-pink-500">Signup</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+        
+        {# Mobile Search Form (visible on mobile, hidden on desktop) #}
+        <!-- Mobile Search Bar (inside header) -->
+<div class="px-4 py-2 bg-white md:hidden mt-1">
+  <form action="/search" method="GET" class="flex items-center bg-gray-100 rounded-full px-4 py-2 shadow-sm border border-gray-200">
+    
+    <!-- Search Icon -->
+    <i class="fas fa-search text-gray-400 mr-2"></i>
+    
+    <!-- Input -->
+    <input
+      id="searchInputMobile"
+      type="text"
+      name="q"
+      placeholder="Search for styles, brands & more"
+      class="flex-grow bg-transparent focus:outline-none text-sm text-gray-700"
+    />
+    
+    <!-- Mic Icon -->
+    <button 
+      type="button"
+      onclick="startVoiceSearch('searchInputMobile', 'micIconMobile')"
+      class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-200 transition ml-2"
+    >
+      <i id="micIconMobile" class="fas fa-microphone text-gray-600 text-base"></i>
+    </button>
+  </form>
+</div>
+
+    </header>
+
+<!-- Optional mobile search overlay -->
+<div id="mobileSearchOverlay" class="fixed inset-0 bg-white z-40 hidden p-4">
+  <form id="mobileSearchForm" action="/search" method="GET" class="flex items-center w-full max-w-md mx-auto border border-gray-300 rounded-full shadow-sm">
+    <input id="mobileSearchInput" name="q" type="search" placeholder="Search..." class="flex-grow px-4 py-2 rounded-l-full focus:outline-none" />
+    <button type="submit" class="px-4 text-pink-500 rounded-r-full hover:bg-pink-50">
+      <i class="fas fa-search"></i>
+    </button>
+    <button type="button" id="closeMobileSearch" class="ml-2 text-2xl text-pink-600 font-bold">&times;</button>
+  </form>
+</div>
+
+
+   <div style="padding-top: 100px;">
+    <main class="px-4 py-6">
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+
+    <footer class="hidden lg:block bg-gray-900 text-white py-10">
+    <div class="container mx-auto px-4">
+
+        <div class="md:hidden">
+            <div class="border-b border-gray-700">
+                <button class="w-full flex justify-between items-center py-4 text-left font-bold" onclick="toggleAccordion('more-about')">
+                    MORE ABOUT LEVIS INDIA STORE
+                    <svg id="more-about-icon" class="w-4 h-4 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="more-about-content" class="overflow-hidden transition-all duration-300 max-h-0">
+                    <ul class="text-sm space-y-1 pb-4 pl-4">
+                        <li><a href="{{ url_for('about_us') }}" class="hover:underline">About Us</a></li>
+                        <li><a href="{{ url_for('stores') }}" class="hover:underline">Stores</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-b border-gray-700">
+                <button class="w-full flex justify-between items-center py-4 text-left font-bold" onclick="toggleAccordion('quick-links')">
+                    QUICK LINKS
+                    <svg id="quick-links-icon" class="w-4 h-4 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="quick-links-content" class="overflow-hidden transition-all duration-300 max-h-0">
+                    <ul class="text-sm space-y-1 pb-4 pl-4">
+                        <li><a href="{{ url_for('careers') }}" class="hover:underline">Careers</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-b border-gray-700">
+                <button class="w-full flex justify-between items-center py-4 text-left font-bold" onclick="toggleAccordion('support')">
+                    SUPPORT
+                    <svg id="support-icon" class="w-4 h-4 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="support-content" class="overflow-hidden transition-all duration-300 max-h-0">
+                    <ul class="text-sm space-y-1 pb-4 pl-4">
+                        <li><a href="{{ url_for('faq') }}" class="hover:underline">FAQ</a></li>
+                        <li><a href="{{ url_for('return_policy') }}" class="hover:underline">Return Policy</a></li>
+                        <li><a href="javascript:void(0)" onclick="toggleChatbot()" class="hover:underline">Need Help?</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-b border-gray-700">
+                <button class="w-full flex justify-between items-center py-4 text-left font-bold" onclick="toggleAccordion('contact')">
+                    CONTACT
+                    <svg id="contact-icon" class="w-4 h-4 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="contact-content" class="overflow-hidden transition-all duration-300 max-h-0">
+                    <ul class="text-sm space-y-1 pb-4 pl-4">
+                        <li><a href="{{ url_for('contact_us') }}" class="hover:underline">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-b border-gray-700">
+                <button class="w-full flex justify-between items-center py-4 text-left font-bold" onclick="toggleAccordion('company')">
+                    COMPANY
+                    <svg id="company-icon" class="w-4 h-4 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="company-content" class="overflow-hidden transition-all duration-300 max-h-0">
+                    <ul class="text-sm space-y-1 pb-4 pl-4">
+                        <li><a href="{{ url_for('privacy_policy') }}" class="hover:underline">Privacy Policy</a></li>
+                        <li><a href="{{ url_for('terms_conditions') }}" class="hover:underline">Terms and Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="hidden md:grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div>
+                <h4 class="font-bold mb-2">Customer Service</h4>
+                <ul class="text-sm space-y-1">
+                    <li><a href="{{ url_for('contact_us') }}" class="hover:underline">Contact Us</a></li>
+                    <li><a href="javascript:void(0)" onclick="toggleChatbot()" class="hover:underline">Need Help?</a></li>
+                    <li><a href="{{ url_for('return_policy') }}" class="hover:underline">Return Policy</a></li>
+                    <li><a href="{{ url_for('faq') }}" class="hover:underline">FAQ</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-2">Company</h4>
+                <ul class="text-sm space-y-1">
+                    <li><a href="{{ url_for('about_us') }}" class="hover:underline">About Us</a></li>
+                    <li><a href="{{ url_for('careers') }}" class="hover:underline">Careers</a></li>
+                    <li><a href="{{ url_for('stores') }}" class="hover:underline">Stores</a></li>
+                    <li><a href="{{ url_for('privacy_policy') }}" class="hover:underline">Privacy Policy</a></li>
+                    <li><a href="{{ url_for('terms_conditions') }}" class="hover:underline">Terms and Conditions</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-2">Follow Us</h4>
+                <div class="flex space-x-4 text-lg">
+                    <a href="{{ settings.facebook_url }}" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="{{ settings.instagram_url }}" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="{{ settings.twitter_url }}" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="{{ settings.linkedin_url }}" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-bold mb-2">We Accept</h4>
+                <img src="{{ url_for('static', filename='images/payment-methods.png') }}" alt="Payment Methods" class="rounded-md">
+            </div>
+        </div>
+
+        <div class="text-center text-gray-500 text-sm mt-10 border-t border-gray-700 pt-6">
+            &copy; 2025, PRAUXE
+        </div>
+    </div>
+</footer>
+
+
+ <div id="chatbot" class="hidden fixed bottom-4 right-4 w-80 bg-white rounded-2xl shadow-xl border z-50">
+  <div class="flex items-center justify-between bg-gray-800 text-white px-4 py-2 rounded-t-2xl">
+    <span>Need Help?</span>
+    <button onclick="toggleChatbot()" class="text-sm">✖</button>
+  </div>
+
+  <div id="chatContent" class="max-h-96 overflow-y-auto p-3 space-y-3 text-sm"></div>
+
+  <!-- Chat input -->
+  <form onsubmit="return handleUserInput(event)" class="p-3 border-t flex space-x-2">
+  <input type="text" id="chatInput" class="w-full border rounded-full px-4 py-2 text-sm" placeholder="Type your message..." onkeydown="if(event.key === 'Enter') sendUserMessage()">
+    <button type="submit" class="text-white bg-blue-600 px-4 py-2 rounded-full">Send</button>
+  </form>
+</div>
+<script>
+    function toggleAccordion(id) {
+        const content = document.getElementById(id + '-content');
+        const icon = document.getElementById(id + '-icon');
+
+        if (content.classList.contains('max-h-0')) {
+            content.classList.remove('max-h-0');
+            content.classList.add('max-h-96');
+            icon.classList.add('rotate-180');
+        } else {
+            content.classList.remove('max-h-96');
+            content.classList.add('max-h-0');
+            icon.classList.remove('rotate-180');
+        }
+    }
+</script>
+<script>
+    // Function to show custom modal messages
+    function showModalMessage(message, type = 'error') {
+        const modal = document.getElementById('messageModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+
+        modalMessage.textContent = message;
+        // You can add more styling here based on 'type' if needed
+        if (type === 'error') {
+            modalMessage.style.color = '#ef4444'; // Tailwind red-500
+        } else {
+            modalMessage.style.color = '#333'; // Default text color
+        }
+
+        modal.classList.add('show');
+
+        modalCloseButton.onclick = () => {
+            modal.classList.remove('show');
+        };
+
+        // Close modal if clicked outside (optional)
+        modal.onclick = (event) => {
+            if (event.target === modal) {
+                modal.classList.remove('show');
+            }
+        };
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const sidebar = document.getElementById('sidebar');
+        const openSidebarBtn = document.getElementById('openSidebar');
+        const closeSidebarBtn = document.getElementById('closeSidebar');
+
+        const mobileSearchOverlay = document.getElementById('mobileSearchOverlay');
+        const openSearchBtn = document.getElementById('openSearch');
+        const closeSearchBtn = document.getElementById('closeMobileSearch');
+
+        openSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full');
+        });
+
+        closeSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+        });
+
+        // Check if openSearchBtn exists before adding event listener
+        if (openSearchBtn) {
+            openSearchBtn.addEventListener('click', () => {
+                mobileSearchOverlay.classList.remove('hidden');
+                document.getElementById('mobileSearchInput').focus();
+            });
+        }
+        
+
+        closeSearchBtn.addEventListener('click', () => {
+            mobileSearchOverlay.classList.add('hidden');
+        });
+    });
+
+        // --- Search Bar Toggle JS ---
+        // Ensure openSearchBtn is correctly referenced or created if it's for mobile search toggle
+        // If 'openSearch' is meant for the desktop search bar toggle, ensure it exists in your HTML.
+        // Assuming 'openSearch' is for a mobile search toggle button that you might have elsewhere.
+        // If it's not present, this part of the JS will not execute.
+        const openSearchBtn = document.getElementById('openSearch'); // This might be undefined if not in HTML
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInputDesktop'); // Changed to Desktop ID
+
+        if (openSearchBtn) { // Only add listener if the button exists
+            openSearchBtn.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent click from bubbling up to document and immediately closing
+                searchForm.classList.toggle('hidden');
+                searchForm.classList.toggle('flex'); // Ensure it displays as flex
+                if (!searchForm.classList.contains('hidden')) {
+                    searchInput.focus(); // Focus on the input when it appears
+                }
+            });
+        }
+
+
+        // Hide search bar when clicking outside on mobile
+        document.addEventListener('click', (event) => {
+            if (window.innerWidth < 768) { // Only apply on mobile (md breakpoint)
+                const isClickInsideSearch = searchForm.contains(event.target) || (openSearchBtn && openSearchBtn.contains(event.target));
+                // Assuming 'openBtn' is a typo and should refer to 'openSidebarBtn'
+                const openSidebarBtnElement = document.getElementById('openSidebar');
+                const isClickInsideSidebarToggle = openSidebarBtnElement && openSidebarBtnElement.contains(event.target); 
+
+                // Close search if clicked outside search area AND not on sidebar toggle AND search is visible
+                if (!isClickInsideSearch && !isClickInsideSidebarToggle && !searchForm.classList.contains('hidden')) {
+                    searchForm.classList.add('hidden');
+                    searchForm.classList.remove('flex');
+                }
+            }
+        });
+
+        // Prevent clicking inside the search form from closing it
+        searchForm.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+    </script>
+
+    <script>
+        // Initialize wishlist hearts on page load for guests
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.isAuthenticated) {
+                const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+                document.querySelectorAll('.wishlist-btn').forEach(button => {
+                    const productId = button.dataset.productId;
+                    const heart = button.querySelector('.heart');
+                    if (wishlist.includes(productId)) {
+                        heart.textContent = '❤️';
+                        heart.className = 'heart text-pink-600';
+                    } else {
+                        heart.textContent = '🤍';
+                        heart.className = 'heart text-gray-400';
+                    }
+                });
+            }
+        });
+
+        // Wishlist toggle button click handler
+        document.querySelectorAll('.wishlist-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.dataset.productId;
+
+                fetch(`/toggle-wishlist/${productId}`, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        const heart = button.querySelector('.heart');
+
+                        if (data.guest) {
+                            // Guest user - update localStorage wishlist
+                            let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+
+                            if (wishlist.includes(productId)) {
+                                wishlist = wishlist.filter(id => id !== productId);
+                                heart.textContent = '🤍';
+                                heart.className = 'heart text-gray-400';
+                            } else {
+                                wishlist.push(productId);
+                                heart.textContent = '❤️';
+                                heart.className = 'heart text-pink-600';
+                            }
+
+                            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+
+                        } else {
+                            // Logged-in user - update heart from server response
+                            heart.textContent = data.in_wishlist ? '❤️' : '🤍';
+                            heart.className = data.in_wishlist ? 'heart text-pink-600' : 'heart text-gray-400';
+                        }
+                    })
+                    .catch(() => {
+                        showModalMessage("Error updating wishlist. Please try again.", 'error'); // Using custom modal
+                    });
+            });
+        });
+    </script>
+    <script>
+        // Renamed showToast to showFlashedMessage to avoid confusion with the new modal
+        function showFlashedMessage(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+
+            toast.className = `fixed top-5 right-5 px-4 py-2 rounded shadow z-50 transition-all duration-300 ${
+                type === 'success' ? 'bg-green-100 text-green-800' :
+                type === 'danger' ? 'bg-red-100 text-red-800' :
+                'bg-gray-100 text-gray-800'
+            }`;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+
+<script>
+(function(){
+  const modal = document.getElementById('exitIntentModal');
+  const closeBtn = document.getElementById('exitModalClose');
+  if (!modal || !closeBtn) return;
+
+  const SHOWN_KEY = 'exitIntentShown';
+  const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Optional: your bag badge element (make sure it exists)
+  // <span id="cartCountBadge" data-count="1" ...>1</span>
+  async function getCartCount() {
+    const badge = document.getElementById('cartCountBadge');
+    if (badge) {
+      const raw = badge.dataset.count || badge.textContent;
+      const n = parseInt((raw || '').trim(), 10);
+      if (!Number.isNaN(n)) return n;
+    }
+    // Fallback: check API
+    try {
+      const res = await fetch('/cart/preview', { credentials: 'same-origin' });
+      if (!res.ok) return 0;
+      const data = await res.json();
+      if (Array.isArray(data.products)) return data.products.length;
+      if (typeof data.count === 'number') return data.count;
+    } catch (_) {}
+    return 0;
+  }
+
+  function showModal() {
+    modal.classList.remove('hidden');
+    // smooth fade if you use opacity utility classes
+    if (!prefersReducedMotion) {
+      requestAnimationFrame(() => {
+        modal.classList.remove('opacity-0');
+        modal.classList.add('opacity-100');
+      });
+    }
+    // lock focus in modal (simple)
+    const focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    (focusable || closeBtn).focus({ preventScroll: true });
+  }
+
+  function hideModal() {
+    if (!prefersReducedMotion) {
+      modal.classList.add('opacity-0');
+      modal.classList.remove('opacity-100');
+      modal.addEventListener('transitionend', () => modal.classList.add('hidden'), { once: true });
+    } else {
+      modal.classList.add('hidden');
+    }
+  }
+
+  function markShownAndDetach() {
+    sessionStorage.setItem(SHOWN_KEY, '1');
+    detach();
+  }
+
+  // Decide if current event indicates exit intent
+  function isExitEvent(e) {
+    if (e.type === 'mouseout') {
+      // classic: leaving at the top, not to another element
+      return e.relatedTarget == null && e.clientY <= 0;
+    }
+    if (e.type === 'pointerleave') {
+      // pointer left the window (desktop mouse only)
+      return e.pointerType === 'mouse';
+    }
+    if (e.type === 'visibilitychange') {
+      // tab being hidden (user switching/closing)
+      return document.visibilityState === 'hidden';
+    }
+    return false;
+  }
+
+  let ticking = false;
+  async function maybeShow(e) {
+    if (ticking) return;
+    ticking = true;
+
+    try {
+      if (sessionStorage.getItem(SHOWN_KEY) === '1') return;
+      if (isTouch) return; // don’t trigger on touch devices
+      if (!isExitEvent(e)) return;
+
+      const count = await getCartCount();
+      if (count > 0) {
+        showModal();
+        markShownAndDetach();
+      }
+    } finally {
+      ticking = false;
+    }
+  }
+
+  function attach() {
+    document.addEventListener('mouseout', maybeShow, { passive: true });
+    document.documentElement.addEventListener('pointerleave', maybeShow, { passive: true });
+    document.addEventListener('visibilitychange', maybeShow, { passive: true });
+  }
+  function detach() {
+    document.removeEventListener('mouseout', maybeShow);
+    document.documentElement.removeEventListener('pointerleave', maybeShow);
+    document.removeEventListener('visibilitychange', maybeShow);
+  }
+
+  // Wire up close actions
+  closeBtn.addEventListener('click', hideModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(); });
+
+  // init (only if not already shown)
+  if (sessionStorage.getItem(SHOWN_KEY) !== '1') attach();
+
+  // DEBUG: uncomment to test repeatedly
+  // sessionStorage.removeItem(SHOWN_KEY);
+})();
+</script>
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var swiper = new Swiper(".mySwiper", {
+            spaceBetween: 30,
+            centeredSlides: true,
+            // Autoplay settings
+            autoplay: {
+                delay: 2500, // Time in ms between slides
+                disableOnInteraction: false, // Continue autoplay after user interaction
+            },
+            // Pagination (dots) settings
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true, // This makes the dots clickable
+            },
+            // Navigation arrows (optional, but good for UX)
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+        });
+    });
+</script>
+<script>
+function buildSearchParamsFromText(text) {
+  const raw = (text || '').toLowerCase();
+
+  // --- price ---
+  // matches: under 2000, below 2k, less than ₹1500, max 899
+  let maxPrice = null, minPrice = null;
+  const numFromK = (s) => Math.round(parseFloat(s.replace(/[^\d.]/g,'')) * 1000);
+  const asNumber = (s) => parseFloat(s.replace(/[^\d.]/g,''));
+  const reUnder = /(under|below|less than|upto|up to)\s*(₹?\s*\d+(\.\d+)?\s*k?)/;
+  const reOver  = /(over|above|more than|from)\s*(₹?\s*\d+(\.\d+)?\s*k?)/;
+  const reBetween = /(between)\s*(₹?\s*\d+(\.\d+)?\s*k?)\s*(and|-|to)\s*(₹?\s*\d+(\.\d+)?\s*k?)/;
+
+  if (reBetween.test(raw)) {
+    const m = raw.match(reBetween);
+    const a = /k/.test(m[2]) ? numFromK(m[2]) : asNumber(m[2]);
+    const b = /k/.test(m[5]) ? numFromK(m[5]) : asNumber(m[5]);
+    minPrice = Math.min(a,b); maxPrice = Math.max(a,b);
+  } else if (reUnder.test(raw)) {
+    const m = raw.match(reUnder);
+    maxPrice = /k/.test(m[2]) ? numFromK(m[2]) : asNumber(m[2]);
+  } else if (reOver.test(raw)) {
+    const m = raw.match(reOver);
+    minPrice = /k/.test(m[2]) ? numFromK(m[2]) : asNumber(m[2]);
+  } else {
+    // plain number e.g. "under 2000 rupees" might be missed; also catch "below ₹999"
+    const solo = raw.match(/₹?\s*(\d{3,5})\b/);
+    if (solo && /under|below|less than|upto|up to/.test(raw)) maxPrice = asNumber(solo[1]);
+    if (solo && /over|above|more than|from/.test(raw))      minPrice = asNumber(solo[1]);
+  }
+
+  // --- category (basic synonyms) ---
+  const categories = {
+    jeans: ['jean','jeans','denim'],
+    tshirt: ['t shirt','t-shirt','tee','tees','tshirt'],
+    shirt: ['shirt','shirts','formal shirt','casual shirt'],
+    dress: ['dress','dresses'],
+    kurta: ['kurta','kurtas'],
+    saree: ['saree','sari'],
+    jacket: ['jacket','jackets'],
+    hoodie: ['hoodie','hoodies'],
+    trousers: ['trouser','trousers','chinos','pants'],
+    shorts: ['short','shorts'],
+    skirt: ['skirt','skirts'],
+    top: ['top','tops'],
+    footwear: ['shoe','shoes','sneaker','sneakers','sandal','sandals','heel','heels']
+  };
+  let category = null;
+  for (const [cat, keys] of Object.entries(categories)) {
+    if (keys.some(k => raw.includes(k))) { category = cat; break; }
+  }
+
+  // --- gender hint ---
+  let gender = null;
+  if (/\bmen|male|boys?\b/.test(raw))    gender = 'men';
+  if (/\bwomen|female|ladies|girls?\b/.test(raw)) gender = 'women';
+  if (/\bunisex\b/.test(raw))            gender = 'unisex';
+
+  // --- colors (optional pass-through) ---
+  const colors = ['black','white','blue','red','green','yellow','pink','purple','grey','gray','beige','brown','navy','maroon'];
+  const color = colors.find(c => raw.includes(c)) || null;
+
+  return { q: text, category, min_price: minPrice, max_price: maxPrice, gender, color };
+}
+
+// Use the parser inside startVoiceSearch before submit
+function submitVoiceQuery(form, params) {
+  const url = new URL(form.action || '/search', window.location.origin);
+  Object.entries(params).forEach(([k,v]) => {
+    if (v !== null && v !== undefined && String(v).trim() !== '') {
+      url.searchParams.set(k, v);
+    }
+  });
+  // navigate to structured search
+  window.location.href = url.toString();
+}
+</script>
+
+
+<script>
+// Voice search function (your existing one, unchanged)
+function startVoiceSearch(searchInputId, micIconId) {
+  const micIcon = document.getElementById(micIconId);
+  const searchInput = document.getElementById(searchInputId);
+  const form = searchInput.closest('form');
+
+  if (!('webkitSpeechRecognition' in window)) {
+    showModalMessage("Voice search not supported in this browser. Please use Chrome or Edge.", 'error');
+    return;
+  }
+
+  const recognition = new webkitSpeechRecognition();
+  recognition.lang = 'en-IN';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  micIcon.classList.add('recording');
+  searchInput.placeholder = "Listening...";
+
+  recognition.start();
+
+  recognition.onresult = function(event) {
+    const transcript = event.results[0][0].transcript;
+    searchInput.value = transcript;
+    const params = buildSearchParamsFromText(transcript);
+    submitVoiceQuery(form, params);
+    searchInput.placeholder = "Search...";
+    micIcon.classList.remove('recording');
+    form.submit();
+  };
+
+  recognition.onerror = function(event) {
+    console.error('Speech recognition error:', event.error);
+    let errorMessage = "Error recognizing voice. Please try again.";
+    if (event.error === 'no-speech') {
+      errorMessage = "No speech detected. Please speak clearly into your microphone.";
+    } else if (event.error === 'not-allowed') {
+      errorMessage = "Microphone access denied. Please allow microphone permissions in your browser settings.";
+    } else if (event.error === 'aborted') {
+      errorMessage = "Voice search cancelled.";
+    } else if (event.error === 'network') {
+      errorMessage = "Network error during voice recognition. Check your internet connection.";
+    }
+    showModalMessage(errorMessage, 'error');
+    searchInput.placeholder = "Search...";
+    micIcon.classList.remove('recording');
+  };
+
+  recognition.onend = function() {
+    micIcon.classList.remove('recording');
+    searchInput.placeholder = "Search...";
+  };
+}
+
+// Chatbot variables
+const username = "{{ current_user.name }}"; // Flask template var
+let hasGreeted = false;
+
+function toggleChatbot() {
+  const chatbot = document.getElementById("chatbot");
+  chatbot.classList.toggle("hidden");
+
+  if (!hasGreeted && !chatbot.classList.contains("hidden")) {
+    setTimeout(() => {
+      appendMessage("Bot", `Hi ${username}, how can I help you?`);
+      showActionButtons();
+      hasGreeted = true;
+    }, 300);
+  }
+}
+
+function handleUserInput(e) {
+  e.preventDefault();
+  const input = document.getElementById("chatInput");
+  const message = input.value.trim();
+  if (!message) return;
+
+  appendMessage("You", message);
+  input.value = "";
+
+  if (["hi", "hello", "hey"].includes(message.toLowerCase())) {
+    setTimeout(() => {
+      appendMessage("Bot", `Hi ${username}, how can I help you?`);
+      showActionButtons();
+    }, 500);
+  } else {
+    fetch("/chatbot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message })
+    })
+    .then(response => response.json())
+    .then(data => appendMessage("Bot", data.reply))
+    .catch(() => appendMessage("Bot", "Sorry, something went wrong."));
+  }
+
+  return false;
+}
+
+// ✅ Escape function to prevent DOM XSS
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function appendMessage(sender, text) {
+  const chatContent = document.getElementById("chatContent");
+  const msg = document.createElement("div");
+
+  const strong = document.createElement("strong");
+  strong.textContent = sender === "You" ? "🗣️ You" : "🤖 Bot";
+  msg.appendChild(strong);
+  msg.appendChild(document.createElement("br"));
+
+  // Split by newline and safely append each line
+  text.split("\n").forEach(line => {
+    const textNode = document.createTextNode(line);
+    msg.appendChild(textNode);
+    msg.appendChild(document.createElement("br"));
+  });
+
+  msg.className = sender === "You"
+    ? "text-right text-black p-2"
+    : "text-left text-gray-800 p-2 bg-gray-100 rounded";
+
+  chatContent.appendChild(msg);
+  chatContent.scrollTop = chatContent.scrollHeight;
+}
+
+function showActionButtons() {
+  const chatContent = document.getElementById("chatContent");
+
+  const buttons = [
+    { text: "📦 Track Order", action: "Track my order", color: "pink" },
+    { text: "❌ Cancel Order", action: "Cancel an item", color: "red" },
+    { text: "🧑‍💼 Contact Support", action: "Contact customer support", color: "yellow" }
+  ];
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "space-y-2 mt-2";
+
+  buttons.forEach(btn => {
+    const button = document.createElement("button");
+    button.textContent = btn.text;
+    button.className = `w-full bg-${btn.color}-100 text-${btn.color}-800 px-4 py-2 rounded-full text-left`;
+    button.onclick = () => sendPredefined(btn.action);
+    wrapper.appendChild(button);
+  });
+
+  chatContent.appendChild(wrapper);
+  chatContent.scrollTop = chatContent.scrollHeight;
+}
+
+function sendPredefined(msg) {
+  appendMessage("You", msg);
+
+  if (msg.toLowerCase().includes("track")) {
+    onTrackOrderSelected();
+    return; // skip the default bot response below
+  }
+
+  let botResponse = "";
+  if (msg.toLowerCase().includes("cancel")) {
+    botResponse = "Please provide the item/order you wish to cancel.";
+  } else if (msg.toLowerCase().includes("contact")) {
+    botResponse = `
+      You can contact us here:<br>
+      📧 Email: connect@prauxe.com<br>
+      📞 Phone: +91-9999999999<br>
+      We're available 9AM to 6PM, Monday to Saturday.
+    `;
+  }
+
+  setTimeout(() => appendMessage("Bot", botResponse), 500);
+}
+
+// === Order tracking integration ===
+
+let orderOffset = 0;
+const orderLimit = 3;
+
+function showMessage(text) {
+  appendMessage("Bot", text);
+}
+
+function showButton(label, onClick) {
+  const chatContent = document.getElementById("chatContent");
+  const btn = document.createElement('button');
+  btn.textContent = label;
+  btn.className = "chat-button bg-blue-200 px-3 py-1 rounded mt-2";
+  btn.onclick = () => {
+    btn.disabled = true;
+    onClick();
+  };
+  chatContent.appendChild(btn);
+  chatContent.scrollTop = chatContent.scrollHeight;
+}
+
+// ... (keep the previous code as is, just replace loadOrders with this updated version)
+
+function loadOrders(offset = 0) {
+  fetch(`/api/user/orders?limit=${orderLimit}&offset=${offset}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.orders.length === 0 && offset === 0) {
+        showMessage("You have no orders yet.");
+        return;
+      }
+
+      // Remove existing "Show more" buttons before appending new messages
+      document.querySelectorAll('.chat-button').forEach(btn => btn.remove());
+
+      const chatContent = document.getElementById("chatContent");
+
+      data.orders.forEach(order => {
+        // Create clickable button for each order
+        const orderBtn = document.createElement('button');
+        orderBtn.textContent = `📦 Order #${order.order_id} — ${order.date}`;
+        orderBtn.className = "chat-button bg-green-200 px-3 py-1 rounded mt-2 text-left w-full";
+        orderBtn.onclick = () => {
+          appendMessage("You", `Order #${order.order_id}`);
+          // Simulate bot reply with status info
+          appendMessage("Bot", `Status of Order #${order.order_id}: ${order.status}`);
+          // Remove "Show more" button if shown (optional UX)
+          document.querySelectorAll('.chat-button').forEach(btn => btn.remove());
+        };
+        chatContent.appendChild(orderBtn);
+      });
+
+      if (data.orders.length === orderLimit) {
+        showButton("Show more orders", () => {
+          orderOffset += orderLimit;
+          loadOrders(orderOffset);
+        });
+      }
+
+      chatContent.scrollTop = chatContent.scrollHeight;
+    })
+    .catch(() => {
+      showMessage("Failed to fetch orders. Please try again.");
+    });
+}
+
+
+function onTrackOrderSelected() {
+  orderOffset = 0;
+  loadOrders(orderOffset);
+}
+
+</script>
+<!-- Hotjar -->
+<script>
+(function(h,o,t,j,a,r){h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+h._hjSettings={hjid:YOUR_ID,hjsv:6};a=o.getElementsByTagName('head')[0];
+r=o.createElement('script');r.async=1;r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+a.appendChild(r);})(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+
+document.addEventListener("DOMContentLoaded", function() {
+    const exitIntentModal = document.getElementById('exitIntentModal');
+    const exitModalClose = document.getElementById('exitModalClose');
+    const hasShownExitModal = sessionStorage.getItem('hasShownExitModal');
+
+    function hasProductsInCart() {
+        // Placeholder: Replace with your actual logic to check the cart
+        // For example, checking a session variable, a cookie, or local storage.
+        // For demonstration, we'll assume there are always products.
+        // In a real application, you'd check `cartItems.length > 0`.
+        return true; 
+    }
+
+    function showModal(e) {
+        if (!hasShownExitModal && hasProductsInCart()) {
+            exitIntentModal.classList.remove('hidden');
+            setTimeout(() => {
+                exitIntentModal.classList.remove('opacity-0');
+            }, 10);
+            sessionStorage.setItem('hasShownExitModal', 'true');
+
+            // This is crucial for the beforeunload event.
+            // It allows the event to be cancelled, showing your prompt.
+            // Some browsers ignore this, but it's best practice to include.
+            if (e) {
+                e.preventDefault();
+                e.returnValue = ''; // Standard for most browsers
+            }
+        }
+    }
+
+    function hideModal() {
+        exitIntentModal.classList.add('opacity-0');
+        exitIntentModal.addEventListener('transitionend', () => {
+            exitIntentModal.classList.add('hidden');
+        }, { once: true });
+    }
+
+    // New: Handle browser/tab close
+    window.addEventListener('beforeunload', function(e) {
+        if (!hasShownExitModal && hasProductsInCart()) {
+            // Display a custom browser confirmation message.
+            // Note: Modern browsers often show a generic message instead of yours.
+            const confirmationMessage = 'You have items in your cart. Are you sure you want to leave?';
+            e.returnValue = confirmationMessage;
+            return confirmationMessage;
+        }
+    });
+
+    // Handle mouse leaving the window (exit intent)
+    document.addEventListener('mouseout', function(e) {
+        if (e.toElement === null && e.relatedTarget === null) {
+            showModal();
+        }
+    });
+
+    // Close button functionality
+    exitModalClose.addEventListener('click', hideModal);
+
+    // Close modal when clicking outside of it
+    exitIntentModal.addEventListener('click', function(e) {
+        if (e.target === exitIntentModal) {
+            hideModal();
+        }
+    });
+});
+</script>
+
+<script src="{{ url_for('static', filename='js/heatmap-tracker.js') }}"></script>
+
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

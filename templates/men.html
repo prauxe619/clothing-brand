@@ -1,0 +1,555 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
+<style>
+    /* Base Styles */
+    body {
+        font-family: 'Montserrat', sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+    }
+
+    .main-content {
+        /* Add padding to push content down below the fixed navbar */
+        padding-top: 80px; /* Adjust this value if your nav bar is taller or shorter */
+    }
+
+    .collection-header {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        font-weight: 600;
+        margin: 30px 20px 20px;
+        text-align: center;
+        color: #222;
+        position: relative;
+    }
+
+    .collection-header::after {
+        content: "";
+        display: block;
+        width: 50px;
+        height: 3px;
+        background-color: #000;
+        margin: 6px auto 0;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 20px;
+        padding: 0 16px 40px;
+        max-width: 1350px;
+        margin: auto;
+    }
+
+    /* Product Card Styles */
+    .product-card {
+        background: transparent;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .product-card a.product-image-link {
+        position: relative;
+        display: block;
+        width: 100%;
+        overflow: hidden;
+        margin-bottom: 0px;
+    }
+
+    .product-image {
+        width: 100%;
+        aspect-ratio: 2/3;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .product-card a.product-image-link:hover .product-image {
+        transform: scale(1.05);
+    }
+
+    .product-name {
+        font-weight: 500;
+        color: #333;
+        margin: 6px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 0.9rem;
+        text-align: left; 
+    }
+    
+    .product-price {
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 10px;
+        font-size: 0.9rem; 
+        text-align: left; 
+        font-family: 'Inter', sans-serif; 
+    }
+
+    /* Wishlist Button Styles */
+    .wishlist-button {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: none;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: none;
+        z-index: 10;
+    }
+
+    .wishlist-button:hover {
+        background-color: transparent;
+        transform: scale(1.2);
+    }
+
+    .wishlist-button i {
+        font-size: 20px;
+    }
+
+    .wishlist-button .fas {
+        color: #ef4444;
+    }
+    .wishlist-button .far {
+        color: #3a3838;
+    }
+
+    /* --- NEW STYLES FOR MOBILE/DESKTOP TOGGLE --- */
+    .desktop-actions-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .mobile-floating-buttons-container {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        /* Hide the desktop sort and filter on mobile */
+        .desktop-actions-container {
+            display: none !important;
+        }
+        
+        /* Show the floating mobile buttons */
+        .mobile-floating-buttons-container {
+            display: flex;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .floating-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 50px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            font-size: 1rem;
+            color: #4b5563;
+            font-weight: 500;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .floating-btn:hover {
+            transform: translateY(-2px) translateX(-50%);
+        }
+        
+        /* Mobile grid adjustments */
+        .product-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            padding: 0 8px 30px;
+        }
+        .product-image {
+            height: clamp(200px, 60vw, 250px);
+        }
+        .product-name {
+            font-size: 0.8rem;
+            line-height: 1.2;
+        }
+        .product-price {
+            font-size: 0.85rem;
+        }
+        .wishlist-button {
+            font-size: 18px;
+            padding: 4px;
+        }
+        .collection-header {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        display: none;
+    }
+
+    .mobile-sort-modal,
+    .mobile-filter-modal {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        padding: 20px;
+        box-sizing: border-box;
+        transform: translateY(100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 1000;
+    }
+
+    .mobile-sort-modal.active,
+    .mobile-filter-modal.active {
+        transform: translateY(0);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+    }
+
+    .modal-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .close-modal-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.5rem;
+        color: #6b7280;
+    }
+
+    .modal-options button {
+        width: 100%;
+        text-align: left;
+        padding: 12px 0;
+        font-size: 1rem;
+        color: #4b5563;
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .modal-options button:hover {
+        background-color: #f3f4f6;
+    }
+</style>
+
+</div>
+    <h2 class="text-2xl md:text-3xl font-extrabold geometric sans-serif text-gray-800 text-center mb-8">MEN'S COLLECTION</h2> 
+    <div style="max-width: 1350px; margin: 0 auto; padding: 0 16px 20px; display: flex; justify-content: flex-end;" class="desktop-actions-container">
+        <div style="position: relative;">
+            <button id="sort-button" style="
+                display: flex;
+                align-items: center;
+                padding: 8px 16px;
+                border: 1px solid #d1d5db;
+                border-radius: 9999px;
+                background-color: #f9fafb;
+                cursor: pointer;
+                font-size: 1rem;
+                color: #374151;
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                transition: all 0.2s ease-in-out;
+                font-family: inherit;
+            ">
+                Sort By: 
+                <span id="current-sort-text" style="font-weight: 500; margin-left: 4px;">Featured</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" style="height: 1.25rem; width: 1.25rem; margin-left: 8px; color: #6b7280; transition: transform 0.2s ease-in-out;">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+    
+            <div id="sort-dropdown" style="
+                position: absolute;
+                top: 100%;
+                right: 0;
+                margin-top: 8px;
+                width: 200px;
+                background-color: white;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                z-index: 10;
+                display: none;
+                overflow: hidden;
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            ">
+                <button class="sort-option" data-value="featured" style="width: 100%; text-align: left; padding: 12px 16px; background-color: transparent; border: none; cursor: pointer; font-size: 0.95rem; color: #4b5563; transition: background-color 0.2s; font-family: inherit;">Featured</button>
+                <button class="sort-option" data-value="popularity" style="width: 100%; text-align: left; padding: 12px 16px; background-color: transparent; border: none; cursor: pointer; font-size: 0.95rem; color: #4b5563; transition: background-color 0.2s; font-family: inherit;">Popularity</button>
+                <button class="sort-option" data-value="price_desc" style="width: 100%; text-align: left; padding: 12px 16px; background-color: transparent; border: none; cursor: pointer; font-size: 0.95rem; color: #4b5563; transition: background-color 0.2s; font-family: inherit;">Price: High to Low</button>
+                <button class="sort-option" data-value="price_asc" style="width: 100%; text-align: left; padding: 12px 16px; background-color: transparent; border: none; cursor: pointer; font-size: 0.95rem; color: #4b5563; transition: background-color 0.2s; font-family: inherit;">Price: Low to High</button>
+                <button class="sort-option" data-value="newest" style="width: 100%; text-align: left; padding: 12px 16px; background-color: transparent; border: none; cursor: pointer; font-size: 0.95rem; color: #4b5563; transition: background-color 0.2s; font-family: inherit;">Newest</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="product-grid">
+        {% for product in products %}
+            <div class="product-card">
+                <a href="{{ url_for('product_details', product_id=product['id']) }}" class="product-image-link">
+                    {% if product['image'] %}
+                       <img class="product-image" src="{{ product['image'] }}" alt="{{ product['name'] }}" />
+                    {% else %}
+                        <img class="product-image" src="{{ url_for('static', filename='default.png') }}" alt="Default Product Image" />
+                    {% endif %}
+                    <button class="wishlist-button" data-id="{{ product['id'] }}">
+                        {% if product['in_wishlist'] %}
+                            <i class="fas fa-heart"></i>
+                        {% else %}
+                            <i class="far fa-heart"></i>
+                        {% endif %}
+                    </button>
+                </a>
+                <div class="product-name">{{ product['name'] }}</div>
+                <div class="product-price">₹{{ product['price'] }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <div class="mobile-floating-buttons-container">
+        <button class="floating-btn" id="mobile-sort-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px;">
+                <path d="M3 6h18M3 12h12M3 18h9"></path>
+            </svg>
+            <span>Sort</span>
+        </button>
+        <button class="floating-btn" id="mobile-filter-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px;">
+                <path d="M22 3H2l8 9.46V19l4 2v-7.54L22 3z"></path>
+            </svg>
+            <span>Filter</span>
+        </button>
+    </div>
+    
+    <div class="mobile-sort-modal" id="mobile-sort-modal">
+        <div class="modal-header">
+            <h3>Sort By</h3>
+            <button class="close-modal-btn">&times;</button>
+        </div>
+        <div class="modal-options">
+            <button class="sort-option" data-value="featured">Featured</button>
+            <button class="sort-option" data-value="popularity">Popularity</button>
+            <button class="sort-option" data-value="price_desc">Price: High to Low</button>
+            <button class="sort-option" data-value="price_asc">Price: Low to High</button>
+            <button class="sort-option" data-value="newest">Newest</button>
+        </div>
+    </div>
+    
+    <div class="mobile-filter-modal" id="mobile-filter-modal">
+        <div class="modal-header">
+            <h3>Filter</h3>
+            <button class="close-modal-btn">&times;</button>
+        </div>
+        <div class="modal-content">
+            <p>Filter options will be displayed here.</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay"></div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Desktop Sort Button Logic
+        const sortButton = document.getElementById('sort-button');
+        const sortDropdown = document.getElementById('sort-dropdown');
+        const currentSortText = document.getElementById('current-sort-text');
+        const sortOptions = document.querySelectorAll('.sort-option');
+        const sortIcon = sortButton?.querySelector('svg');
+
+        // Mobile Modal Logic
+        const mobileSortButton = document.getElementById('mobile-sort-button');
+        const mobileFilterButton = document.getElementById('mobile-filter-button');
+        const mobileSortModal = document.getElementById('mobile-sort-modal');
+        const mobileFilterModal = document.getElementById('mobile-filter-modal');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const closeModalBtns = document.querySelectorAll('.close-modal-btn');
+
+        function openModal(modal) {
+            if (modal && modalOverlay) {
+                modal.classList.add('active');
+                modalOverlay.style.display = 'block';
+            }
+        }
+
+        function closeModal() {
+            if (mobileSortModal) mobileSortModal.classList.remove('active');
+            if (mobileFilterModal) mobileFilterModal.classList.remove('active');
+            if (modalOverlay) modalOverlay.style.display = 'none';
+        }
+
+        if (mobileSortButton) {
+            mobileSortButton.addEventListener('click', () => openModal(mobileSortModal));
+        }
+        if (mobileFilterButton) {
+            mobileFilterButton.addEventListener('click', () => openModal(mobileFilterModal));
+        }
+
+        closeModalBtns.forEach(btn => {
+            btn.addEventListener('click', closeModal);
+        });
+
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', closeModal);
+        }
+
+        if (sortButton && sortDropdown && currentSortText) {
+            sortButton.addEventListener('click', function(event) {
+                event.stopPropagation();
+                const isVisible = sortDropdown.style.display === 'block';
+                if (isVisible) {
+                    sortDropdown.style.display = 'none';
+                    if (sortIcon) sortIcon.style.transform = 'rotate(0deg)';
+                } else {
+                    sortDropdown.style.display = 'block';
+                    if (sortIcon) sortIcon.style.transform = 'rotate(180deg)';
+                }
+            });
+        }
+
+        sortOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const selectedText = this.textContent.trim();
+                
+                if (currentSortText) {
+                    currentSortText.textContent = selectedText;
+                }
+
+                if (sortDropdown) sortDropdown.style.display = 'none';
+                if (sortIcon) sortIcon.style.transform = 'rotate(0deg)';
+                closeModal(); 
+                
+                const url = new URL(window.location.href);
+                url.searchParams.set('sort', selectedValue);
+                window.location.href = url.toString(); 
+            });
+        });
+
+        window.addEventListener('click', function(e) {
+            if (sortButton && sortDropdown && !sortButton.contains(e.target) && !sortDropdown.contains(e.target)) {
+                sortDropdown.style.display = 'none';
+                if (sortIcon) sortIcon.style.transform = 'rotate(0deg)';
+            }
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentSort = urlParams.get('sort');
+        if (currentSort) {
+            const selectedOption = document.querySelector(`.sort-option[data-value="${currentSort}"]`);
+            if (selectedOption) {
+                if (currentSortText) {
+                    currentSortText.textContent = selectedOption.textContent.trim();
+                }
+            }
+        }
+        
+        // Wishlist Button Logic
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        document.body.addEventListener("click", function(e) {
+            const button = e.target.closest(".wishlist-button");
+            if (button) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const productId = button.dataset.id;
+                const icon = button.querySelector('i');
+
+                if (!productId || !csrfToken) {
+                    console.error("Product ID or CSRF Token is missing.");
+                    alert("Error: Missing required data for wishlist operation.");
+                    return;
+                }
+
+                const size = 'N/A';
+                const color = 'N/A';
+                const payload = { product_id: productId, size: size, color: color };
+
+                fetch('/add_to_wishlist', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken,
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        return res.json().then(errorData => {
+                            throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
+                        }).catch(() => {
+                            throw new Error(`HTTP error! status: ${res.status}`);
+                        });
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success && icon) {
+                        if (data.action === 'added') {
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                        } else {
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                        }
+                    } else {
+                        alert(data.message || 'Error updating wishlist.');
+                    }
+                })
+                .catch(err => {
+                    console.error("Error toggling wishlist:", err);
+                    alert("An error occurred while updating wishlist.");
+                });
+            }
+        });
+    });
+</script>
+
+{% endblock %}

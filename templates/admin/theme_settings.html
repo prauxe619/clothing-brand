@@ -1,0 +1,77 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-6 shadow-md rounded-lg mt-10">
+  <h2 class="text-2xl font-semibold mb-6 text-gray-800">Customize Site Theme</h2>
+
+  <form method="POST" enctype="multipart/form-data" class="space-y-6">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <!-- Preset Theme -->
+    <div>
+      <label for="preset_theme" class="block text-sm font-medium text-gray-700 mb-1">Choose Preset Theme</label>
+      <select name="preset_theme" id="preset_theme" class="w-full border border-gray-300 rounded px-3 py-2">
+        <option value="">-- Custom Theme --</option>
+        <option value="default" {% if preset_theme == 'default' %}selected{% endif %}>Default (Inter + Pink)</option>
+        <option value="dark" {% if preset_theme == 'dark' %}selected{% endif %}>Dark (Playfair + Orange)</option>
+        <option value="gold" {% if preset_theme == 'gold' %}selected{% endif %}>Gold (Playfair + Gold)</option>
+      </select>
+    </div>
+
+    <!-- Primary Color -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Primary Color</label>
+      <input type="color" name="primary_color" value="{{ settings.primary_color or '#e91e63' }}"
+             class="w-full h-12 border border-gray-300 rounded cursor-pointer">
+    </div>
+
+    <!-- Background Color -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Background Color</label>
+      <input type="color" name="background_color" value="{{ settings.background_color or '#ffffff' }}"
+             class="w-full h-12 border border-gray-300 rounded cursor-pointer">
+    </div>
+
+    <!-- Font Family -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Font Family</label>
+      <select name="font_family" class="w-full border border-gray-300 rounded px-3 py-2">
+        <option value="'Inter', sans-serif" {% if settings.font_family == "'Inter', sans-serif" %}selected{% endif %}>Inter</option>
+        <option value="'Playfair Display', serif" {% if settings.font_family == "'Playfair Display', serif" %}selected{% endif %}>Playfair Display</option>
+        <option value="Arial, sans-serif" {% if settings.font_family == "Arial, sans-serif" %}selected{% endif %}>Arial</option>
+      </select>
+    </div>
+
+    <!-- Custom CSS Upload -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Upload Custom CSS</label>
+      <input type="file" name="custom_css" accept=".css"
+             class="block w-full text-sm text-gray-600 border border-gray-300 rounded px-3 py-2">
+      {% if settings.custom_css_file %}
+      <p class="text-xs text-green-600 mt-1">Current: {{ settings.custom_css_file }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex items-center justify-between mt-6">
+      <button type="button" onclick="previewTheme()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+        Preview
+      </button>
+      <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">
+        Save Theme
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+function previewTheme() {
+  const primary = document.querySelector('input[name="primary_color"]').value;
+  const bg = document.querySelector('input[name="background_color"]').value;
+  const font = document.querySelector('select[name="font_family"]').value;
+
+  document.documentElement.style.setProperty('--primary-color', primary);
+  document.documentElement.style.setProperty('--background-color', bg);
+  document.body.style.fontFamily = font;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="px-6 py-10 min-h-screen bg-gray-50">
+  <h2 class="text-2xl font-bold mb-6 text-gray-800">Search Results for “{{ query }}”</h2>
+
+  {% if results %}
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+    {% for product in results %}
+    <a href="/product/{{ product.id }}" class="bg-white rounded-lg shadow hover:shadow-md transition">
+     <img src="{{ product.main_image_url }}" alt="{{ product.name }}"alt="{{ product.name }}"
+            class="w-full h-60 object-cover rounded-t-md">
+
+      <div class="p-3">
+        <h3 class="text-sm font-medium text-gray-800 truncate">{{ product.name }}</h3>
+        <p class="text-black-600 font-bold">₹{{ product.price }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-gray-500 mt-4">No products found matching your search.</p>
+  {% endif %}
+</div>
+{% endblock %}

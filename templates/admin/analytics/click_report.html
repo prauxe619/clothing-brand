@@ -1,0 +1,34 @@
+<h1>Click Tracking Report</h1>
+
+<div style="margin-bottom: 20px;">
+    <p><b>Total Clicks:</b> {{ total_clicks }}</p>
+    <p><b>Unique Users:</b> {{ unique_users }}</p>
+    <p><b>Unique Pages Clicked:</b> {{ unique_pages }}</p>
+</div>
+
+<table border="1" cellpadding="5" style="border-collapse: collapse; width: 100%;">
+    <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Page</th>
+            <th>X</th>
+            <th>Y</th>
+            <th>Screen Width</th>
+            <th>Screen Height</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for click in clicks %}
+        <tr>
+            <td>{{ click.user_id or "Guest" }}</td>
+            <td>{{ click.page }}</td>
+            <td>{{ click.x }}</td>
+            <td>{{ click.y }}</td>
+            <td>{{ click.screen_width }}</td>
+            <td>{{ click.screen_height }}</td>
+            <td>{{ click.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

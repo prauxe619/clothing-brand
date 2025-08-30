@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best Sellers</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .best-sellers-section {
+            max-width: 900px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .best-sellers-section h2 {
+            text-align: center;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .product-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .product-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .product-rank {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+            margin-right: 20px;
+            width: 40px;
+            text-align: center;
+        }
+        .product-thumb {
+            width: 80px;
+            height: 80px;
+            overflow: hidden;
+            border-radius: 5px;
+            margin-right: 20px;
+        }
+        .product-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-details {
+            flex-grow: 1;
+        }
+        .product-details h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        .product-details .price {
+            font-weight: bold;
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+    <div class="best-sellers-section">
+        <h2>Our Best Sellers</h2>
+        <ul class="product-list">
+            <li class="product-item">
+                <div class="product-rank">1</div>
+                <div class="product-thumb">
+                    <img src="https://via.placeholder.com/80" alt="Best Seller 1">
+                </div>
+                <div class="product-details">
+                    <h3>Best Seller Product 1</h3>
+                    <div class="price">$45.00</div>
+                </div>
+            </li>
+
+            <li class="product-item">
+                <div class="product-rank">2</div>
+                <div class="product-thumb">
+                    <img src="https://via.placeholder.com/80" alt="Best Seller 2">
+                </div>
+                <div class="product-details">
+                    <h3>Top Rated Product 2</h3>
+                    <div class="price">$75.50</div>
+                </div>
+            </li>
+
+            <li class="product-item">
+                <div class="product-rank">3</div>
+                <div class="product-thumb">
+                    <img src="https://via.placeholder.com/80" alt="Best Seller 3">
+                </div>
+                <div class="product-details">
+                    <h3>Customer Favorite 3</h3>
+                    <div class="price">$120.00</div>
+                </div>
+            </li>
+
+            </ul>
+    </div>
+</body>
+</html>

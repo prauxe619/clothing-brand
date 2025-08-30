@@ -1,0 +1,470 @@
+{% extends "base.html" %}
+
+{% block title %}Your Wishlist{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 py-10 px-4 min-h-screen">
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">💖 Your Wishlist</h1>
+
+        {% if wishlist_items %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {# Iterate over the list of items (each item is a database object or a dictionary) #}
+            {% for item in wishlist_items %}
+
+            {# Use different logic for authenticated vs. guest users #}
+            {% if current_user.is_authenticated %}
+                {% set product = item.product %}
+                {% set size = item.size_name %}
+                {% set color = item.color_name %}
+            {% else %}
+                {% set product = Product.query.get(item.get('product_id')) %}
+                {% set size = item.get('size') %}
+                {% set color = item.get('color') %}
+            {% endif %}
+
+            {# Only render if the product actually exists #}
+            {% if product %}
+            <div class="bg-white border rounded-lg shadow-sm hover:shadow-md transition product-card-{{ product.id }}">
+                <a href="{{ url_for('product_details', product_id=product.id) }}">
+                    <img src="{{ product.main_image_url }}" alt="{{ product.name }}"
+                        class="w-full h-60 object-cover rounded-t-md">
+                </a>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 truncate">{{ product.name }}</h3>
+                    {# Display variants if they exist #}
+                    <p class="text-gray-500 text-sm">
+                        {% if size and size != 'N/A' %}Size: {{ size }}{% endif %}
+                        {% if size and size != 'N/A' and color and color != 'N/A' %}, {% endif %}
+                        {% if color and color != 'N/A' %}Color: {{ color }}{% endif %}
+                    </p>
+                    <p class="text-pink-600 font-bold mt-1">₹{{ product.price }}</p>
+                    <div class="flex justify-between items-center mt-4 text-sm">
+                        <button type="button"
+                          class="add-to-cart-from-wishlist-btn-list bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 transition"
+                          data-product-id="{{ product.id }}"
+                          data-product-name="{{ product.name | e }}"
+                          data-size-name="{{ size or 'N/A' }}"
+                          data-color-name="{{ color or 'N/A' }}"
+                          data-product-has-sizes="{{ 'true' if product.sizes and product.sizes|length > 0 else 'false' }}"
+                          data-product-has-colors="{{ 'true' if product.colors and product.colors|length > 0 else 'false' }}">
+                            Add to Cart
+                        </button>
+                        <button type="button" class="remove-from-wishlist-btn text-red-500 hover:underline px-2 py-1"
+                                 data-product-id="{{ product.id }}"
+                                 data-size="{{ size or 'N/A' }}"
+                                 data-color="{{ color or 'N/A' }}">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-gray-500 mt-8 empty-wishlist-message">
+            <p>You haven't added any products to your wishlist yet.</p>
+            <a href="{{ url_for('home') }}" class="mt-4 inline-block text-pink-600 hover:underline font-medium">Start Shopping</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# The Modal structure is correct #}
+<div id="size-color-selection-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm mx-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-gray-800">Select Options for <span id="modal-product-name" class="text-pink-600"></span></h2>
+            <button id="close-modal" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+        </div>
+        
+        <div id="modal-options-container" class="space-y-4">
+            <div id="modal-size-section" class="hidden">
+                <p class="text-sm font-semibold text-gray-700 mb-2">Select Size:</p>
+                <div id="modal-size-options" class="grid grid-cols-3 gap-2"></div>
+            </div>
+            
+            <div id="modal-color-section" class="hidden">
+                <p class="text-sm font-semibold text-gray-700 mb-2">Select Color:</p>
+                <div id="modal-color-options" class="flex flex-wrap gap-2"></div>
+            </div>
+        </div>
+
+        <button id="add-to-cart-from-modal-btn" class="w-full bg-pink-600 text-white py-2 rounded-md hover:bg-pink-700 transition disabled:opacity-50 disabled:cursor-not-allowed mt-6" disabled>
+            Add to Cart
+        </button>
+        <p id="modal-error-message" class="text-red-500 text-sm mt-2 hidden text-center"></p>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    if (!csrfToken) {
+        console.error("CSRF Token meta tag not found. Please ensure it's in your base.html.");
+    }
+
+    function updateEmptyWishlistMessage() {
+        const wishlistGrid = document.querySelector('.grid');
+        let emptyMessageContainer = document.querySelector('.empty-wishlist-message');
+
+        if (wishlistGrid && wishlistGrid.children.length === 0) {
+            if (!emptyMessageContainer) {
+                const mainContainer = document.querySelector('.max-w-6xl.mx-auto');
+                if (mainContainer) {
+                    mainContainer.insertAdjacentHTML('beforeend', `
+                        <div class="text-center text-gray-500 mt-8 empty-wishlist-message">
+                            <p>You haven't added any products to your wishlist yet.</p>
+                            <a href="{{ url_for('home') }}" class="mt-4 inline-block text-pink-600 hover:underline font-medium">Start Shopping</a>
+                        </div>
+                    `);
+                }
+            }
+        } else if (emptyMessageContainer) {
+            emptyMessageContainer.remove();
+        }
+    }
+
+    // --- Modal Elements ---
+    const modal = document.getElementById('size-color-selection-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const modalProductName = document.getElementById('modal-product-name');
+    const modalSizeSection = document.getElementById('modal-size-section');
+    const modalSizeOptions = document.getElementById('modal-size-options');
+    const modalColorSection = document.getElementById('modal-color-section');
+    const modalColorOptions = document.getElementById('modal-color-options');
+    const addToCartFromModalBtn = document.getElementById('add-to-cart-from-modal-btn');
+    const modalErrorMessage = document.getElementById('modal-error-message');
+
+    let currentProductId = null;
+    let selectedSize = null;
+    let selectedColor = null;
+    let hasSizes = false;
+    let hasColors = false;
+
+    function resetModal() {
+        currentProductId = null;
+        selectedSize = null;
+        selectedColor = null;
+        hasSizes = false;
+        hasColors = false;
+        modalProductName.textContent = '';
+        modalSizeOptions.innerHTML = '';
+        modalColorOptions.innerHTML = '';
+        modalSizeSection.classList.add('hidden');
+        modalColorSection.classList.add('hidden');
+        addToCartFromModalBtn.disabled = true;
+        modalErrorMessage.classList.add('hidden');
+    }
+
+    function checkEnableButton() {
+        const sizeSelected = !hasSizes || (selectedSize !== null && selectedSize !== 'N/A');
+        const colorSelected = !hasColors || (selectedColor !== null && selectedColor !== 'N/A');
+        addToCartFromModalBtn.disabled = !(sizeSelected && colorSelected);
+    }
+
+    /**
+     * openModal: renders the modal UI.
+     * If 'variants' argument is provided (object with sizes/colors arrays), it will use that
+     * instead of fetching from the server again. This avoids double-fetch when the caller already
+     * has the variants.
+     */
+    function openModal(productId, productName, hasSizeVariants, hasColorVariants, sizeName, colorName, variants) {
+        resetModal();
+        currentProductId = productId;
+        modalProductName.textContent = productName;
+        hasSizes = hasSizeVariants;
+        hasColors = hasColorVariants;
+
+        // Helper to render using sizes/colors arrays
+        function renderWithData(sizesArr, colorsArr) {
+            const sizesData = { sizes: Array.isArray(sizesArr) ? sizesArr : [] };
+            const colorsData = { colors: Array.isArray(colorsArr) ? colorsArr : [] };
+
+            // --- Sizes ---
+            if (hasSizes && sizesData.sizes.length > 0) {
+                modalSizeSection.classList.remove('hidden');
+                sizesData.sizes.forEach(size => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.textContent = size.name;
+                    button.className = 'size-option px-4 py-2 border rounded-md text-sm font-medium bg-gray-100 text-gray-800 hover:border-pink-600 hover:bg-pink-50 hover:text-pink-600 transition';
+                    button.dataset.size = size.name;
+                    button.addEventListener('click', function() {
+                        modalSizeOptions.querySelectorAll('.size-option').forEach(btn => btn.classList.remove('bg-pink-600','text-white','hover:bg-pink-700'));
+                        this.classList.add('bg-pink-600','text-white','hover:bg-pink-700');
+                        selectedSize = this.dataset.size;
+                        checkEnableButton();
+                    });
+                    modalSizeOptions.appendChild(button);
+
+                    if (sizeName && size.name.trim().toLowerCase() === (sizeName || '').trim().toLowerCase()) {
+                        button.click();
+                    }
+                });
+
+                // fallback: pick first size if nothing matched
+                if (!selectedSize && modalSizeOptions.querySelector('.size-option')) {
+                    modalSizeOptions.querySelector('.size-option').click();
+                }
+            } else {
+                selectedSize = sizeName;
+            }
+
+            // --- Colors ---
+            if (hasColors && colorsData.colors.length > 0) {
+                modalColorSection.classList.remove('hidden');
+                colorsData.colors.forEach(color => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.textContent = color.name;
+                    button.className = 'color-option px-4 py-2 border rounded-md text-sm font-medium bg-gray-100 text-gray-800 hover:border-pink-600 hover:bg-pink-50 hover:text-pink-600 transition';
+                    button.dataset.color = color.name;
+                    button.addEventListener('click', function() {
+                        modalColorOptions.querySelectorAll('.color-option').forEach(btn => btn.classList.remove('bg-pink-600','text-white','hover:bg-pink-700'));
+                        this.classList.add('bg-pink-600','text-white','hover:bg-pink-700');
+                        selectedColor = this.dataset.color;
+                        checkEnableButton();
+                    });
+                    modalColorOptions.appendChild(button);
+
+                    if (colorName && color.name.trim().toLowerCase() === (colorName || '').trim().toLowerCase()) {
+                        button.click();
+                    }
+                });
+
+                // fallback: pick first color if nothing matched
+                if (!selectedColor && modalColorOptions.querySelector('.color-option')) {
+                    modalColorOptions.querySelector('.color-option').click();
+                }
+            } else {
+                selectedColor = colorName;
+            }
+
+            modal.classList.remove('hidden');
+            checkEnableButton();
+        }
+
+        // If caller passed variants, use them. Otherwise fetch from server (backwards compatible).
+        if (variants && (Array.isArray(variants.sizes) || Array.isArray(variants.colors))) {
+            renderWithData(variants.sizes || [], variants.colors || []);
+            return;
+        }
+
+        // fetch from unified endpoint if no prefetched data
+        fetch(`/api/product_variants/${productId}`)
+        .then(res => {
+            if (!res.ok) throw new Error(`Failed to fetch variants: ${res.status}`);
+            return res.json();
+        })
+        .then(json => {
+            renderWithData(Array.isArray(json.sizes) ? json.sizes : [], Array.isArray(json.colors) ? json.colors : []);
+        })
+        .catch(err => {
+            console.error('Error fetching variants for modal:', err);
+            modalErrorMessage.textContent = 'Error loading options. You can still try adding to cart.';
+            modalErrorMessage.classList.remove('hidden');
+            modal.classList.remove('hidden');
+        });
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        resetModal();
+    }
+
+    closeModalBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(event) { if (event.target === modal) closeModal(); });
+    document.addEventListener('keydown', function(event) { if (event.key === 'Escape' && !modal.classList.contains('hidden')) closeModal(); });
+
+    // ---------------------------
+    // NEW: Reliable click handler for wishlist "Add to Cart"
+    // - Always fetch /api/product_variants/<id> first (server is source of truth)
+    // - If variants exist -> show modal (prefilling saved values)
+    // - If no variants -> direct add to cart (old behavior)
+    // ---------------------------
+    document.querySelectorAll('.add-to-cart-from-wishlist-btn-list').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            const productName = this.dataset.productName || '';
+            const savedSize = this.dataset.sizeName === 'N/A' ? null : this.dataset.sizeName;
+            const savedColor = this.dataset.colorName === 'N/A' ? null : this.dataset.colorName;
+
+            // Always ask server for the real variants first
+            fetch(`/api/product_variants/${productId}`)
+            .then(res => {
+                if (!res.ok) {
+                    // fallback: if server fails, use the data-* attributes as a last resort
+                    throw new Error('Failed to fetch variants');
+                }
+                return res.json();
+            })
+            .then(json => {
+                const sizes = Array.isArray(json.sizes) ? json.sizes : [];
+                const colors = Array.isArray(json.colors) ? json.colors : [];
+
+                const hasSizeVariants = sizes.length > 0 && !(sizes.length === 1 && (sizes[0].name === 'N/A' || sizes[0].name === null));
+                const hasColorVariants = colors.length > 0 && !(colors.length === 1 && (colors[0].name === 'N/A' || colors[0].name === null));
+
+                if (hasSizeVariants || hasColorVariants) {
+                    // Show modal using prefetched variants (avoid double-fetch)
+                    openModal(productId, productName, hasSizeVariants, hasColorVariants, savedSize, savedColor, { sizes, colors });
+                } else {
+                    // No variants -> direct add to cart (same behaviour as before)
+                    sendAddToCartRequest(productId, null, null);
+                }
+            })
+            .catch(err => {
+                console.warn('Could not fetch variants; falling back to data attributes.', err);
+                // fallback: rely on data attributes (old behavior) if server call fails
+                const hasSizesAttr = this.dataset.productHasSizes === 'true';
+                const hasColorsAttr = this.dataset.productHasColors === 'true';
+                if (hasSizesAttr || hasColorsAttr) {
+                    openModal(productId, productName, hasSizesAttr, hasColorsAttr, savedSize, savedColor);
+                } else {
+                    sendAddToCartRequest(productId, null, null);
+                }
+            });
+        });
+    });
+
+    // Event listener for the "Add to Cart" button inside the modal
+    addToCartFromModalBtn.addEventListener('click', function() {
+        if (!csrfToken) {
+            alert("Error: Security token missing. Please refresh the page.");
+            return;
+        }
+
+        if (hasSizes && (selectedSize === null || selectedSize === 'N/A')) {
+            modalErrorMessage.textContent = 'Please select a size.';
+            modalErrorMessage.classList.remove('hidden');
+            return;
+        }
+
+        if (hasColors && (selectedColor === null || selectedColor === 'N/A')) {
+            modalErrorMessage.textContent = 'Please select a color.';
+            modalErrorMessage.classList.remove('hidden');
+            return;
+        }
+
+        sendAddToCartRequest(currentProductId, selectedSize, selectedColor);
+        closeModal();
+    });
+
+    // AJAX add-to-cart (unchanged)
+    function sendAddToCartRequest(productId, size, color) {
+        fetch('/add_to_cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: 1,
+                size: size,
+                color: color,
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || 'Add to cart failed'); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data.success) throw new Error(data.message || 'Add to cart failed');
+
+            // remove matching wishlist card
+            const allCards = document.querySelectorAll(`.remove-from-wishlist-btn[data-product-id="${productId}"]`);
+            let cardToRemove = null;
+            allCards.forEach(btn => {
+                const btnSize = btn.dataset.size || "N/A";
+                const btnColor = btn.dataset.color || "N/A";
+                if (
+                    (size === null || size === btnSize || btnSize === "N/A") &&
+                    (color === null || color === btnColor || btnColor === "N/A")
+                ) {
+                    cardToRemove = btn.closest('.bg-white.border');
+                }
+            });
+
+            if (cardToRemove) {
+                cardToRemove.remove();
+                updateEmptyWishlistMessage();
+            }
+
+            // Update bag count
+            const bagCountSpan = document.getElementById('bag-item-count');
+            if (bagCountSpan && data.bag_count !== undefined) {
+                bagCountSpan.textContent = data.bag_count;
+            }
+
+            alert(data.message || 'Item added to cart!');
+        })
+        .catch(err => {
+            console.error('Add to cart error:', err);
+            alert('An error occurred: ' + (err.message || err));
+        });
+    }
+
+    // --- Handle "Remove" button via AJAX (unchanged) ---
+    document.querySelectorAll('.remove-from-wishlist-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            const size = this.dataset.size;
+            const color = this.dataset.color;
+
+            if (!confirm("Are you sure you want to remove this item from your wishlist?")) {
+                return;
+            }
+
+            if (!csrfToken) {
+                alert("Error: Security token missing. Please refresh the page.");
+                return;
+            }
+
+            fetch(`/remove_from_wishlist`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({ product_id: productId, size: size, color: color })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => { throw new Error(errorData.message || `HTTP error! status: ${response.status}`); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert(data.message || 'Item removed from wishlist!');
+                    const productCard = button.closest('.bg-white.border');
+                    if (productCard) {
+                        productCard.remove();
+                        updateEmptyWishlistMessage();
+                    }
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to remove from wishlist.'));
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error removing from wishlist:', error);
+                alert('An error occurred while removing from wishlist. Please check console for details.');
+            });
+        });
+    });
+
+    updateEmptyWishlistMessage();
+});
+</script>
+
+
+{% endblock %}

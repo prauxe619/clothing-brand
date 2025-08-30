@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ | PRAUXE Clothing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Light blue-gray background */
+            color: #334155; /* Darker text for readability */
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif; /* Assuming Playfair Display for titles */
+            font-size: 2.5rem; /* 40px */
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #1a202c;
+        }
+        h2 {
+            font-size: 1.75rem; /* 28px */
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+            color: #1a202c;
+        }
+        .faq-item {
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            cursor: pointer;
+            font-weight: 600;
+            color: #1a202c;
+            transition: color 0.2s ease-in-out;
+        }
+        .faq-question:hover {
+            color: #ec4899; /* Pink-600 */
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 1rem;
+            color: #475569; /* Slate-600 */
+        }
+        .faq-answer p {
+            padding-bottom: 1rem;
+        }
+        .faq-item.active .faq-answer {
+            max-height: 500px; /* Adjust as needed for content length */
+            transition: max-height 0.3s ease-in;
+        }
+        .faq-item.active .faq-question .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+        .faq-question .fa-chevron-down {
+            transition: transform 0.3s ease-in-out;
+        }
+        a {
+            color: #ec4899; /* Pink-600 for links */
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container bg-white shadow-lg rounded-lg my-8">
+        <h1>Frequently Asked Questions</h1>
+        <p class="text-center text-gray-600 mb-8">Find answers to common questions about our products, orders, shipping, and more.</p>
+
+        <div class="space-y-4">
+            <h2>Orders & Payments</h2>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>How do I place an order?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Browse our website, select the desired product, choose your size and quantity, and click "Add to Bag." Once you're ready, proceed to the checkout page, fill in your details, and complete the payment.</p>
+                </div>
+            </div>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>What payment methods do you accept?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>We accept major credit/debit cards (Visa, MasterCard, RuPay), Net Banking, UPI, and various digital wallets through our secure payment gateway, Razorpay. Cash on Delivery (COD) may be available for select pincodes.</p>
+                </div>
+            </div>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>Can I cancel or modify my order after placing it?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Orders can only be canceled or modified within a very short window after placement, typically before they are dispatched. Please contact our customer service immediately if you need to make changes. Once an order has been shipped, it cannot be canceled or modified.</p>
+                </div>
+            </div>
+
+            <h2>Shipping & Delivery</h2>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>What are your shipping charges?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Shipping charges vary based on your order value and delivery location. We offer free shipping on all orders above a certain value (e.g., ₹999). Exact shipping costs will be calculated and displayed at checkout.</p>
+                </div>
+            </div>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>How long does delivery take?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Standard delivery typically takes 3-7 business days, depending on your location. Remote areas might take longer. You can check estimated delivery times for your pincode on each product page.</p>
+                </div>
+            </div>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>How can I track my order?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Once your order is shipped, you will receive an email and SMS with a tracking number and a link to track your package. You can also find your tracking information in your account's "Order History" section.</p>
+                </div>
+            </div>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>Do you offer Cash on Delivery (COD)?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes, we offer Cash on Delivery for most pincodes. You can check if COD is available for your location on the product page or at checkout using our pincode checker.</p>
+                </div>
+            </div>
+
+            <h2>Returns & Exchanges</h2>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>What is your return policy?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>We offer an easy 14-day return and exchange policy from the date of delivery. Items must be unused, unwashed, with all original tags and packaging intact. Please refer to our <a href="{{ url_for('return_policy') }}" class="text-pink-600 hover:underline">Return Policy</a> page for full details.</p>
+                </div>
+            </div>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>How do I initiate a return or exchange?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>You can initiate a return or exchange request through your account's "Order History" section or by contacting our customer service team with your order details.</p>
+                </div>
+            </div>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>When will I receive my refund?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Refunds are processed within 7-10 business days after the returned item passes our quality check. The refund will be credited to your original payment method.</p>
+                </div>
+            </div>
+
+            <h2>Products & Sizing</h2>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>How do I choose the correct size?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>We provide a detailed size chart on each product page. We recommend comparing your body measurements with our size chart for the best fit. If you're still unsure, feel free to contact our customer service for assistance.</p>
+                </div>
+            </div>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>What materials are your clothes made from?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Our products are made from a variety of high-quality fabrics. Specific material compositions are listed on each product's detail page under the "Product Details" section.</p>
+                </div>
+            </div>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>How do I care for my PRAUXE clothing?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Care instructions are provided on the garment's label. Generally, we recommend following the washing and drying instructions to maintain the quality and longevity of your clothing.</p>
+                </div>
+            </div>
+
+            <h2>Account & Security</h2>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>How do I create an account?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Click on the "Sign Up" or "Register" link in the top navigation bar. You can register using your email address, or conveniently sign up with your Google account for a quick and easy process.</p>
+                </div>
+            </div>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>I forgot my password. How can I reset it?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>On the login page, click the "Forgot Password?" link. Enter your registered email address, and we will send you instructions to reset your password.</p>
+                </div>
+            </div>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>Is my personal information secure?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes, we take data security seriously. We use various administrative, technical, and physical security measures to protect your personal information. For more details, please refer to our <a href="{{ url_for('privacy_policy') }}" class="text-pink-600 hover:underline">Privacy Policy</a>.</p>
+                </div>
+            </div>
+
+            <h2>General</h2>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>How can I contact customer service?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>You can reach our customer service team via email at [Your Company Email Address, e.g., support@prauxeclothing.com] or by phone at [Your Company Phone Number]. Our support hours are [e.g., Monday to Friday, 9 AM - 6 PM IST].</p>
+                </div>
+            </div>
+
+            <div class="faq-item rounded-md shadow-sm">
+                <div class="faq-question p-4 bg-gray-50 hover:bg-gray-100 rounded-md">
+                    <span>Do you have physical stores?</span>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Currently, PRAUXE Clothing operates exclusively online to offer you the best prices and widest selection. We do not have physical retail stores.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqItems = document.querySelectorAll('.faq-item');
+
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                const answer = item.querySelector('.faq-answer');
+
+                question.addEventListener('click', () => {
+                    // Close all other open FAQ items
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item && otherItem.classList.contains('active')) {
+                            otherItem.classList.remove('active');
+                            otherItem.querySelector('.faq-answer').style.maxHeight = '0';
+                        }
+                    });
+
+                    // Toggle the clicked FAQ item
+                    item.classList.toggle('active');
+                    if (item.classList.contains('active')) {
+                        answer.style.maxHeight = answer.scrollHeight + 'px';
+                    } else {
+                        answer.style.maxHeight = '0';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

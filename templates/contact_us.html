@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-4">Contact Us</h1>
+<p>If you have any questions, please reach out to us!</p>
+<form class="max-w-md mt-6" action="#" method="POST">
+  <label>Name:</label>
+  <input type="text" name="name" required class="w-full p-2 border rounded mb-4" />
+  <label>Email:</label>
+  <input type="email" name="email" required class="w-full p-2 border rounded mb-4" />
+  <label>Message:</label>
+  <textarea name="message" rows="5" required class="w-full p-2 border rounded mb-4"></textarea>
+  <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Send</button>
+</form>
+{% endblock %}

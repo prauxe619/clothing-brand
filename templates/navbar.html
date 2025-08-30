@@ -1,0 +1,39 @@
+<nav style="background: #f0f0f0; padding: 10px;">
+    <a href="{{ url_for('home') }}">Home</a> |
+    <a href="{{ url_for('men') }}">Men</a> |
+    <a href="{{ url_for('women') }}">Women</a> |
+    <a href="{{ url_for('about') }}">About</a> |
+    <a href="{{ url_for('cart') }}">Cart</a> |
+    <a href="{{ url_for('checkout') }}">Checkout</a> |
+
+    {% if current_user.is_authenticated %}
+        <div class="dropdown" style="display:inline-block; position:relative;">
+            <a href="#" class="dropbtn" style="padding: 8px; background: #ddd; border-radius: 5px;">👤 {{ current_user.username }} ▼</a>
+            <div class="dropdown-content" style="display:none; position:absolute; background:#fff; min-width:160px; box-shadow:0 8px 16px rgba(0,0,0,0.2); z-index:1; border-radius: 4px;">
+                <a href="{{ url_for('profile') }}" style="display:block; padding:10px; text-decoration:none; color:#333;">My Profile</a>
+                <a href="{{ url_for('orders') }}" style="display:block; padding:10px; text-decoration:none; color:#333;">Past Orders</a>
+                <a href="{{ url_for('logout') }}" style="display:block; padding:10px; text-decoration:none; color:#333;">Logout</a>
+            </div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const dropBtn = document.querySelector('.dropbtn');
+                const dropdown = document.querySelector('.dropdown-content');
+
+                dropBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+                });
+
+                window.addEventListener('click', function(e) {
+                    if (!e.target.matches('.dropbtn')) {
+                        dropdown.style.display = 'none';
+                    }
+                });
+            });
+        </script>
+    {% else %}
+        <a href="{{ url_for('login') }}">Login</a> |
+        <a href="{{ url_for('signup') }}">Signup</a>
+    {% endif %}
+</nav>

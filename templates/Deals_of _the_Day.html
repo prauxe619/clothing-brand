@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deals of the Day</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .deal-container {
+            max-width: 800px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+        }
+        .deal-container h1 {
+            color: #d9534f;
+            font-size: 2.5em;
+        }
+        .product-image {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        .product-image img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .deal-details {
+            margin: 20px 0;
+        }
+        .old-price {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 1.2em;
+        }
+        .new-price {
+            font-size: 2em;
+            color: #d9534f;
+            font-weight: bold;
+        }
+        .countdown {
+            margin: 20px 0;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        .countdown span {
+            color: #d9534f;
+        }
+        .shop-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #0275d8;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            transition: background-color 0.2s;
+        }
+        .shop-button:hover {
+            background-color: #025aa5;
+        }
+    </style>
+</head>
+<body>
+    <div class="deal-container">
+        <h1>Deals of the Day!</h1>
+        <div class="product-image">
+            <img src="https://via.placeholder.com/500" alt="Deal of the Day Product">
+        </div>
+        <h2>Amazing Product Name</h2>
+        <p>This is a limited-time offer. Grab this incredible deal before it's gone!</p>
+        <div class="deal-details">
+            <div class="old-price">$199.99</div>
+            <div class="new-price">$99.99</div>
+        </div>
+        <div class="countdown">
+            Time Left: <span id="countdown-timer">08h 30m 15s</span>
+        </div>
+        <a href="#" class="shop-button">Shop Now</a>
+    </div>
+
+    <script>
+        // A simple JavaScript function for the countdown timer
+        // You would need to set the end time dynamically
+        const countdownEl = document.getElementById('countdown-timer');
+        const endTime = new Date().getTime() + (8 * 60 * 60 * 1000) + (30 * 60 * 1000) + (15 * 1000);
+
+        const timer = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = endTime - now;
+
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            countdownEl.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+
+            if (distance < 0) {
+                clearInterval(timer);
+                countdownEl.innerHTML = "EXPIRED";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

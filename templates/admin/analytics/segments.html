@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h2 class="text-xl font-bold mb-4">👥 Customer Segments</h2>
+
+<table class="table-auto w-full border">
+  <thead>
+    <tr class="bg-gray-200">
+      <th class="p-2 border">Segment</th>
+      <th class="p-2 border">User Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for segment, count in segments %}
+    <tr>
+      <td class="p-2 border">{{ segment }}</td>
+      <td class="p-2 border">{{ count }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

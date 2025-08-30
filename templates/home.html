@@ -1,0 +1,511 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Swiper Container -->
+<div class="swiper mySwiper relative w-full">
+  <div class="swiper-wrapper">
+    {% for banner in banners %}
+    <div class="swiper-slide relative">
+      <img src="{{ banner.image_path }}" alt="{{ banner.heading or 'Banner' }}" class="w-full aspect-[16/9] md:aspect-auto md:h-[480px] object-cover" loading="lazy">
+
+      {% if banner.heading or banner.subheading %}
+      <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center text-white text-center p-4">
+        <h2 class="text-3xl font-bold">{{ banner.heading }}</h2>
+        <p class="text-lg mt-2">{{ banner.subheading }}</p>
+        {% if banner.link %}
+        <a href="{{ banner.link }}" class="mt-4 bg-white text-black px-4 py-2 rounded">Shop Now</a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+    <div class="swiper-pagination absolute bottom-4 left-1/2 transform -translate-x-1/2"></div>
+</div>
+
+
+<section class="relative w-full min-h-[60svh] md:min-h-[70vh] overflow-hidden">
+    <img src="{{ url_for('static', filename='images/hero-banner.jpg') }}" alt="Main Banner" class="w-full h-full object-cover">
+    <div class="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-white text-center p-4">
+        <h1 class="text-4xl md:text-6xl font-bold font-playfair mb-2"></h1>
+        <p class="text-lg md:text-xl mt-2 max-w-2xl"></p>
+        <a href="{{ url_for('men_collection') }}" class="mt-8 px-8 py-3 bg-white text-pink-600 font-semibold rounded-full hover:bg-gray-200 transition shadow-lg">
+            Shop Now
+        </a>
+    </div>
+  </div>
+ </div>
+</section>
+
+<!-- New Arrivals -->
+<section> 
+    <h2 class="text-2xl md:text-3xl font-extrabold geometric sans-serif text-gray-800 text-center mb-8">NEW ARRIVALS</h2>
+    <div class="product-grid">
+        {% for product in new_arrivals %}
+        <div class="product-card">
+            <a href="{{ url_for('product_details', product_id=product.id) }}" class="product-image-link">
+                {% if product.image %}
+                    <img class="product-image" src="{{ product.image }}" alt="{{ product.name }}">
+                {% else %}
+                    <img class="product-image" src="https://placehold.co/400x300/E0E0E0/333333?text=No+Image" alt="{{ product.name }}">
+                {% endif %}
+
+                <button class="wishlist-button" data-id="{{ product.id }}">
+                    {% if product.id in user_wishlist_ids %}
+                        <i class="fas fa-heart"></i>
+                    {% else %}
+                        <i class="far fa-heart"></i>
+                    {% endif %}
+                </button>
+            </a>
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-price">{{ format_price(product.price) }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="py-12 bg-gray-100 px-4 md:px-16">
+  <h2 class="text-2xl md:text-3xl font-extrabold geometric sans-serif text-gray-800 text-center mb-8">
+    SHOP BY CATEGORY
+  </h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-8xl mx-auto">
+    <!-- Women -->
+    <a href="{{ url_for('women_collection') }}"
+       class="group block relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 focus:outline-none focus:ring-4 focus:ring-pink-200"
+       aria-label="Shop Women">
+      <img src="{{ url_for('static', filename='images/cat-women.jpg') }}"
+           alt="Women category"
+           class="w-full h-96 object-cover transform transition-transform duration-500 group-hover:scale-105" />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-transparent pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 bg-black bg-opacity-60 w-full p-4">
+                <h3 class="text-xl font-bold text-white uppercase tracking-wider">WOMEN</h3>
+            </div>
+    </a>
+
+    <!-- Men -->
+    <a href="{{ url_for('men_collection') }}"
+       class="group block relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 focus:outline-none focus:ring-4 focus:ring-pink-200"
+       aria-label="Shop Men">
+      <img src="{{ url_for('static', filename='images/cat-men.jpg') }}"
+           alt="Men category"
+           class="w-full h-96 object-cover transform transition-transform duration-500 group-hover:scale-105" />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-transparent pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 bg-black bg-opacity-60 w-full p-4">
+                <h3 class="text-xl font-bold text-white uppercase tracking-wider">MEN</h3>
+            </div>
+    </a>
+
+
+    <!-- Ethnic -->
+    <a href="{{ url_for('category', category_name='ethnic') }}"
+       class="group block relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 focus:outline-none focus:ring-4 focus:ring-pink-200"
+       aria-label="Shop Ethnic">
+      <img src="{{ url_for('static', filename='images/cat-ethnic.jpg') }}"
+           alt="Ethnic category"
+           class="w-full h-96 object-cover transform transition-transform duration-500 group-hover:scale-105" />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-transparent pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 bg-black bg-opacity-60 w-full p-4">
+                <h3 class="text-xl font-bold text-white uppercase tracking-wider">ETHNIC</h3>
+            </div>
+    </a>
+
+    <!-- Western -->
+    <a href="{{ url_for('category', category_name='western') }}"
+       class="group block relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 focus:outline-none focus:ring-4 focus:ring-pink-200"
+       aria-label="Shop Western">
+      <img src="{{ url_for('static', filename='images/cat-western.jpg') }}"
+           alt="Western category"
+           class="w-full h-96 object-cover transform transition-transform duration-500 group-hover:scale-105" />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-transparent pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 bg-black bg-opacity-60 w-full p-4">
+                <h3 class="text-xl font-bold text-white uppercase tracking-wider">WESTERN</h3>
+            </div>
+    </a>
+
+    <!-- New Arrivals -->
+    <a href="{{ url_for('new_arrivals_page') }}"
+       class="group block relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 focus:outline-none focus:ring-4 focus:ring-pink-200"
+       aria-label="Shop New Arrivals">
+      <img src="{{ url_for('static', filename='images/new-arrival.jpg') }}"
+           alt="New arrivals"
+           class="w-full h-96 object-cover transform transition-transform duration-500 group-hover:scale-105" />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-transparent pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 bg-black bg-opacity-60 w-full p-4">
+                <h3 class="text-xl font-bold text-white uppercase tracking-wider">NEW ARRIVALS</h3>
+            </div>
+    </a>
+
+    <!-- Formals -->
+    <a href="{{ url_for('category', category_name='formals') }}"
+       class="group block relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 focus:outline-none focus:ring-4 focus:ring-pink-200"
+       aria-label="Shop Formals">
+      <img src="{{ url_for('static', filename='images/formals.jpg') }}"
+           alt="Formals category"
+           class="w-full h-96 object-cover transform transition-transform duration-500 group-hover:scale-105" />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-transparent pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 bg-black bg-opacity-60 w-full p-4">
+                <h3 class="text-xl font-bold text-white uppercase tracking-wider">FORMALS</h3>
+            </div>
+    </a>
+  </div>
+</section>
+
+{# --- NEW: Recently Viewed Products Section (Advanced UI) --- #}
+{% if recently_viewed_products %}
+<section>
+    <h2 class="text-2xl md:text-3xl font-extrabold geometric sans-serif text-gray-800 text-center mb-8">RECENTLY VIEWED</h2>
+    <div class="product-grid">
+        {% for product in recently_viewed_products[-8:] %}
+        <div class="product-card">
+            <!-- Image + Wishlist -->
+            <a href="{{ url_for('product_details', product_id=product['id']) }}" class="product-image-link">
+                {% if product['image'] %}
+                    <img class="product-image" src="{{ product['image'] }}" alt="{{ product['name'] }}">
+                {% else %}
+                    <img class="product-image" src="https://placehold.co/400x300/E0E0E0/333333?text=No+Image" alt="{{ product['name'] }}">
+                {% endif %}
+
+                <button class="wishlist-button" data-id="{{ product['id'] }}">
+                    {% if product.id in user_wishlist_ids %}
+                        <i class="fas fa-heart"></i>
+                    {% else %}
+                        <i class="far fa-heart"></i>
+                    {% endif %}
+                </button>
+            </a>
+
+            <!-- Product Info -->
+            <div class="product-name">{{ product['name'] }}</div>
+            <div class="product-price">{{ format_price(product.price) }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+
+{% endif %}
+
+<section class="py-12 bg-gray-100 px-4 md:px-16">
+    <h2 class="text-2xl md:text-3xl font-extrabold geometric sans-serif text-gray-800 text-center mb-8">🔥 TRENDING NOW</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-8xl mx-auto">
+        <a href="{{ url_for('women_collection', category='light_linen') }}" class="block relative overflow-hidden square-lg shadow-md hover:shadow-xl transition-shadow duration-300 group">
+            <img src="{{ url_for('static', filename='images/trending-girl.jpg') }}" alt="Light Linen" class="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-300">
+            <div class="absolute bottom-0 left-0 bg-black bg-opacity-60 w-full p-4">
+                <h3 class="text-xl font-bold text-white uppercase tracking-wider">LIGHT LINEN</h3>
+            </div>
+        </a>
+        
+        <a href="{{ url_for('men_collection', category='timeless_denim') }}" class="block relative overflow-hidden square-lg shadow-md hover:shadow-xl transition-shadow duration-300 group">
+            <img src="{{ url_for('static', filename='images/trending-boy.jpg') }}" alt="Timeless Denim" class="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-300">
+            <div class="absolute bottom-0 left-0 bg-black bg-opacity-60 w-full p-4">
+                <h3 class="text-xl font-bold text-white uppercase tracking-wider">TIMELESS DENIM</h3>
+            </div>
+        </a>
+
+        <a href="{{ url_for('women_collection', category='ribcage_wideleg') }}" class="block relative overflow-hidden square-lg shadow-md hover:shadow-xl transition-shadow duration-300 group">
+            <img src="{{ url_for('static', filename='images/trending-mix.jpg') }}" alt="Iconic Ribcage Wideleg" class="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-300">
+            <div class="absolute bottom-0 left-0 bg-black bg-opacity-60 w-full p-4">
+                <h3 class="text-xl font-bold text-white uppercase tracking-wider">ICONIC RIB CAGE WIDELEG</h3>
+            </div>
+        </a>
+    </div>
+</section>
+
+<section class="py-10 bg-gray-100 px-4 md:px-16">
+    <div class="rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition max-w-8xl mx-auto">
+        <a href="/festive"> {# Assuming a /festive route exists or will be created #}
+            <img src="{{ url_for('static', filename='images/banner-seasonal.jpg') }}" alt="Festive Collection"
+                 class="w-full h-64 object-cover md:h-96 hover:scale-105 transition-transform duration-500">
+        </a>
+    </div>
+</section>
+
+<section>
+    <h2 class="text-2xl md:text-3xl font-extrabold geometric sans-serif text-gray-800 text-center mb-8"> BESTSELLER</h2>
+    <div class="product-grid">
+        {% for product in bestsellers %}
+        <div class="product-card">
+            <a href="{{ url_for('product_details', product_id=product.id) }}" class="product-image-link">
+                {% if product.image %}
+                    <img class="product-image" src="{{ product.image }}" alt="{{ product.name }}">
+                {% else %}
+                    <img class="product-image" src="https://placehold.co/400x300/E0E0E0/333333?text=No+Image" alt="{{ product.name }}">
+                {% endif %}
+
+                <button class="wishlist-button" data-id="{{ product.id }}">
+                    {% if product.id in user_wishlist_ids %}
+                        <i class="fas fa-heart"></i>
+                    {% else %}
+                        <i class="far fa-heart"></i>
+                    {% endif %}
+                </button>
+            </a>
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-price">{{ format_price(product.price) }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Suggested Products -->
+{% if suggested_products %}
+<section>
+    <h2 class="text-2xl md:text-3xl font-extrabold geometric sans-serif text-gray-800 text-center mb-8">YOU MIGHT LIKE THIS</h2>
+    <div class="product-grid">
+        {% for product in suggested_products %}
+        <div class="product-card">
+            <a href="{{ url_for('product_details', product_id=product.id) }}" class="product-image-link">
+                {% if product.image %}
+                    <img class="product-image" src="{{ product.image }}" alt="{{ product.name }}">
+                {% else %}
+                    <img class="product-image" src="https://placehold.co/400x300/E0E0E0/333333?text=No+Image" alt="{{ product.name }}">
+                {% endif %}
+
+                <button class="wishlist-button" data-id="{{ product.id }}">
+                    {% if product.id in user_wishlist_ids %}
+                        <i class="fas fa-heart"></i>
+                    {% else %}
+                        <i class="far fa-heart"></i>
+                    {% endif %}
+                </button>
+            </a>
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-price">{{ format_price(product.price) }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+<section class="py-12 bg-gray-100 px-4 md:px-16">
+    <h2 class="text-2xl md:text-3xl font-extrabold geometric sans-serif text-gray-800 mb-8 text-center uppercase tracking-wide">BEST OF THE MONTH</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <a href="{{ url_for('men_collection', fit='505-straight') }}" class="block relative overflow-hidden square-lg shadow-md hover:shadow-xl transition-shadow duration-300 group">
+            <img src="{{ url_for('static', filename='images/fit-of-the-month-men.jpg') }}" alt="505 Straight" class="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-300">
+            <div class="absolute bottom-0 left-0 w-full p-6 text-white text-left">
+                <h3 class="text-5xl font-extrabold tracking-tight mb-2">505™ STRAIGHT</h3>
+                <p class="text-sm font-semibold uppercase tracking-wider">Structured all the way.</p>
+            </div>
+        </a>
+        
+        <a href="{{ url_for('women_collection', fit='ribcage-wide-leg') }}" class="block relative overflow-hidden square-lg shadow-md hover:shadow-xl transition-shadow duration-300 group">
+            <img src="{{ url_for('static', filename='images/fit-of-the-month-women.jpg') }}" alt="Ribcage Wide Leg" class="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-300">
+            <div class="absolute bottom-0 left-0 w-full p-6 text-white text-left">
+                <h3 class="text-5xl font-extrabold tracking-tight mb-2">RIBCAGE WIDE LEG</h3>
+                <p class="text-sm font-semibold uppercase tracking-wider">High rise. Wide leg. All ease.</p>
+            </div>
+        </a>
+    </div>
+</section>
+
+<section class="py-6 px-4 md:px-16 relative overflow-hidden">
+    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ url_for('static', filename='images/bottom-banner.jpg') }}');"></div>
+
+    <div class="absolute inset-0 bg-black opacity-60"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between p-8 space-y-6 md:space-y-0 text-white text-center md:text-left">
+        
+        <div class="flex-1">
+            <h2 class="text-2xl md:text-2xl font-bold tracking-wider uppercase">
+                Download the PRAUXE App
+            </h2>
+        </div>
+
+        <div class="flex-1 flex flex-col items-center justify-center space-y-2">
+            <span class="text-sm md:text-base font-semibold uppercase">Get an extra</span>
+            <span class="text-5xl md:text-6xl font-extrabold tracking-tight">10% OFF</span>
+        </div>
+
+        <div class="flex-1 flex flex-col space-y-4 md:space-y-0 md:space-x-4 md:flex-row items-center justify-center md:justify-end">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+            
+            <a href="#" class="inline-flex items-center justify-center rounded-md border border-white px-5 py-3 text-base font-medium text-white hover:bg-white hover:text-gray-900 transition-colors">
+                <i class="fab fa-google-play mr-2"></i> Get it on Google Play
+            </a>
+            <a href="#" class="inline-flex items-center justify-center rounded-md border border-white px-5 py-3 text-base font-medium text-white hover:bg-white hover:text-gray-900 transition-colors">
+                <i class="fab fa-apple mr-2"></i> Download on the App Store
+            </a>
+        </div>
+    </div>
+</section>
+<section class="py-12 px-4 md:px-16 bg-white text-center">
+    <div class="max-w-xl mx-auto bg-gray-100 p-8 rounded-lg shadow-lg">
+        <h3 class="text-2xl font-bold font-playfair mb-3 text-gray-800">Join Our Newsletter</h3>
+        <p class="text-gray-600 mb-6">Get exclusive updates on new arrivals, sales, and special offers!</p>
+        
+        {# Added an ID to the form for easy JavaScript selection #}
+        <form id="newsletterForm" class="flex flex-col md:flex-row justify-center items-center gap-3">
+            {# Added id and name attributes #}
+            <input type="email" name="email" id="newsletterEmail" placeholder="Enter your email" required
+                   class="border border-gray-300 p-3 rounded-md w-full md:flex-grow focus:ring-pink-500 focus:border-pink-500">
+            <button type="submit"
+                    class="bg-gray-800 text-white px-6 py-3 rounded-md hover:bg-black transition w-full md:w-auto">
+                Subscribe
+            </button>
+        </form>
+        {# Container for messages #}
+        <div id="newsletterMessage" class="mt-4 text-sm font-semibold"></div>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const newsletterForm = document.getElementById('newsletterForm');
+    const newsletterEmailInput = document.getElementById('newsletterEmail');
+    const newsletterMessageDiv = document.getElementById('newsletterMessage');
+    
+    // Get CSRF token from meta tag (assuming you have one in base.html)
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission (page reload)
+
+            const email = newsletterEmailInput.value;
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('csrf_token', csrfToken); // Include CSRF token
+
+            newsletterMessageDiv.textContent = 'Subscribing...';
+            newsletterMessageDiv.className = 'mt-4 text-sm font-semibold text-gray-600';
+
+            fetch('/subscribe_newsletter', {
+                method: 'POST',
+                body: formData, // Use FormData for form submission
+                headers: {
+                    // 'Content-Type' is automatically set by FormData when not explicitly set
+                    // for fetch, but if you were sending JSON, you'd set it to 'application/json'
+                    'X-CSRFToken': csrfToken // Also send as a header for Flask-WTF CSRFProtect
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    newsletterMessageDiv.textContent = data.message;
+                    newsletterMessageDiv.className = 'mt-4 text-sm font-semibold text-green-600';
+                    newsletterEmailInput.value = ''; // Clear the input field
+                } else {
+                    newsletterMessageDiv.textContent = data.message;
+                    newsletterMessageDiv.className = 'mt-4 text-sm font-semibold text-red-600';
+                }
+            })
+            .catch(error => {
+                console.error('Error during newsletter subscription:', error);
+                newsletterMessageDiv.textContent = 'An unexpected error occurred. Please try again.';
+                newsletterMessageDiv.className = 'mt-4 text-sm font-semibold text-red-600';
+            });
+        });
+    }
+});
+</script>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Get CSRF token from meta tag (assuming you have one in base.html)
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    // Add to Cart button logic (This will now only apply to "Recently Viewed" section if it has the button)
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.productId;
+            const quantity = 1; // Default quantity for quick add
+            const size = 'N/A'; // No size selection on homepage, send N/A
+            const color = 'N/A'; // No color selection on homepage, send N/A
+
+            const payload = { product_id: productId, quantity: quantity, size: size, color: color };
+            console.log("Home Page Add to Cart Request Payload:", payload);
+
+            fetch('/add_to_cart', { // Correct URL, no product_id in path
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken // CRITICAL: CSRF Token
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message); // Using alert for now, replace with toast later
+                } else {
+                    alert('Error: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error (Add to Cart from Home):', error);
+                alert('Network error. Please try again.');
+            });
+        });
+    });
+
+    // Toggle Wishlist button logic (Applies to all wishlist buttons, including the new one)
+    document.querySelectorAll('.wishlist-button').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.id;
+            const icon = this.querySelector('i');
+            const size = 'N/A'; // No size selection on homepage
+            const color = 'N/A'; // No color selection on homepage
+
+            const payload = { product_id: productId, size: size, color: color };
+            console.log("Home Page Toggle Wishlist Request Payload:", payload);
+
+            fetch('/add_to_wishlist', { // This endpoint handles toggling (add/remove)
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken // CRITICAL: CSRF Token
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message); // Using alert for now
+                    if (data.action === 'added') { // Assuming backend sends 'action'
+                        icon.classList.remove('far');
+                        icon.classList.add('fas', 'text-pink-600');
+                    } else { // 'removed'
+                        icon.classList.remove('fas', 'text-pink-600');
+                        icon.classList.add('far');
+                    }
+                } else {
+                    alert('Error updating wishlist: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error (Toggle Wishlist from Home):', error);
+                alert('Network error. Please try again.');
+            });
+        });
+    });
+});
+document.addEventListener('DOMContentLoaded', function() {
+        const recentlyViewedData = JSON.parse(localStorage.getItem('recentlyViewed')) || [];
+        const recentlyViewedContainer = document.getElementById('recently-viewed-products');
+        const recentlyViewedSection = document.getElementById('recently-viewed-section');
+
+        if (recentlyViewedData.length > 0) {
+            recentlyViewedSection.classList.remove('hidden'); // Show the section
+
+            recentlyViewedData.forEach(product => {
+                const productCard = `
+                    <a href="/product/${product.id}" class="block bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover rounded-t-lg">
+                        <div class="p-4">
+                            <h3 class="text-lg font-semibold text-gray-800 truncate">${product.name}</h3>
+                            <p class="text-pink-600 font-bold mt-1">₹${parseFloat(product.price).toFixed(2)}</p>
+                        </div>
+                    </a>
+                `;
+                recentlyViewedContainer.insertAdjacentHTML('beforeend', productCard);
+            });
+        }
+    });
+</script>
+{% endblock %}

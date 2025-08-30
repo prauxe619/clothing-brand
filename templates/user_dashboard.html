@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 py-10 px-4 min-h-screen">
+  <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8 space-y-10">
+
+    <div class="text-center">
+      <h1 class="text-3xl font-bold text-gray-800">Welcome, {{ current_user.username }} 👋</h1>
+      <p class="text-gray-600 mt-1">Manage your profile, orders, and preferences</p>
+    </div>
+
+<div class="flex justify-center px-4">
+  <div class="w-full max-w-4xl">
+    <div class="flex flex-col md:flex-row items-start gap-6">
+      <div class="w-full md:w-1/2 text-center">
+        <p class="text-sm font-medium text-gray-700 mb-2">Current Profile Picture</p>
+        {% if current_user.profile_pic %}
+          <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}"
+               alt="Profile Picture"
+               class="w-32 h-32 object-cover rounded-full mx-auto border shadow-md">
+        {% else %}
+          <img src="{{ url_for('static', filename='default_profile.png') }}"
+               alt="Default Picture"
+               class="w-24 h-24 rounded-full mx-auto mb-2 object-cover border-2 border-gray-300">
+        {% endif %}
+      </div>
+
+      <form action="/upload_profile_pic" method="POST" enctype="multipart/form-data" class="w-full md:w-1/2">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Upload Profile Picture</label>
+        <input type="file" name="profile_pic" accept="image/*" required
+               class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100" />
+        <button type="submit"
+                 class="mt-3 bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded-md">
+          Upload
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+      
+   <div class="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+  <a href="/edit-profile" class="group block bg-white rounded-3xl shadow-lg p-8 text-center hover:shadow-2xl transition cursor-pointer">
+    <div class="mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-pink-600 group-hover:text-pink-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A9 9 0 1118.878 6.197 9 9 0 015.12 17.804z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    </div>
+    <h3 class="font-semibold text-lg text-gray-900 mb-1">Edit Profile</h3>
+    <p class="text-gray-600 text-sm">Update your name, email, and other personal info.</p>
+  </a>
+
+  <a href="/change-password" class="group block bg-white rounded-3xl shadow-lg p-8 text-center hover:shadow-2xl transition cursor-pointer">
+    <div class="mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-yellow-600 group-hover:text-yellow-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <rect x="5" y="11" width="14" height="10" rx="2" ry="2" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 7v4" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8 11v-3a4 4 0 018 0v3" />
+      </svg>
+    </div>
+    <h3 class="font-semibold text-lg text-gray-900 mb-1">Change Password</h3>
+    <p class="text-gray-600 text-sm">Keep your account secure by updating your password regularly.</p>
+  </a>
+
+  <a href="{{ url_for('wishlist') }}" class="group block bg-white rounded-3xl shadow-lg p-8 text-center hover:shadow-2xl transition cursor-pointer">
+    <div class="mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-purple-600 group-hover:text-purple-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
+      </svg>
+    </div>
+    <h3 class="font-semibold text-lg text-gray-900 mb-1">Wishlist</h3>
+    <p class="text-gray-600 text-sm">View and manage your saved favorite items.</p>
+  </a>
+
+  <a href="{{ url_for('orders') }}" class="group block bg-white rounded-3xl shadow-lg p-8 text-center hover:shadow-2xl transition cursor-pointer">
+    <div class="mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-blue-600 group-hover:text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6M7 7h10a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 7V5a3 3 0 016 0v2" />
+      </svg>
+    </div>
+    <h3 class="font-semibold text-lg text-gray-900 mb-1">Orders</h3>
+    <p class="text-gray-600 text-sm">Review all your past orders and track shipments.</p>
+  </a>
+
+  <a href="{{ url_for('saved_addresses') }}" class="group block bg-white rounded-3xl shadow-lg p-8 text-center hover:shadow-2xl transition cursor-pointer">
+    <div class="mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-pink-600 group-hover:text-pink-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3m-6 0h6" />
+      </svg>
+    </div>
+    <h3 class="font-semibold text-lg text-gray-900 mb-1">Saved Addresses</h3>
+    <p class="text-gray-600 text-sm">View, add, and edit your saved shipping addresses.</p>
+  </a>
+
+  <a href="{{ url_for('logout') }}" class="group block bg-white rounded-3xl shadow-lg p-8 text-center hover:shadow-2xl transition cursor-pointer">
+    <div class="mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-gray-600 group-hover:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+      </svg>
+    </div>
+    <h3 class="font-semibold text-lg text-gray-900 mb-1">Logout</h3>
+    <p class="text-gray-600 text-sm">Securely log out of your account.</p>
+  </a>
+</div>
+
+
+    <div class="mt-12 px-4 py-2 max-w-3xl mx-auto text-center text-gray-600 text-lg select-none" aria-label="Danger Zone">
+  <div class="flex justify-center items-center gap-4">
+    
+    <button type="button" onclick="showDeleteModal()"
+            class="inline-block bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 rounded-md font-semibold transition focus:outline-none focus:ring-2 focus:ring-red-400"
+            aria-describedby="dangerZoneDesc">
+      Delete Profile
+    </button>
+  </div>
+  <p id="dangerZoneDesc" class="sr-only">
+    Permanent account deletion. This action cannot be undone.
+  </p>
+</div>
+
+
+<div id="deleteModal" class="fixed inset-0 z-50 overflow-y-auto hidden" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+    <div class="flex items-center justify-center min-h-screen p-4 text-center">
+        <div class="fixed inset-0 bg-black opacity-50" aria-hidden="true"></div>
+        <div class="relative bg-white rounded-lg p-6 w-full max-w-sm shadow-lg">
+            <h3 id="deleteModalTitle" class="text-lg font-bold text-gray-800 mb-4">Confirm Account Deletion</h3>
+            <p class="text-gray-600 mb-6">Are you absolutely sure you want to delete your account? This action is irreversible.</p>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="hideDeleteModal()" class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-md text-sm font-semibold">
+                    Cancel
+                </button>
+                <form action="{{ url_for('delete_account') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-semibold">
+                        Yes, Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  function showDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+  function hideDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+</script>
+
+  </div>
+</div>
+{% endblock %}

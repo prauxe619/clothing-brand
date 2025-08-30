@@ -1,0 +1,377 @@
+{# templates/checkout.html #}
+{% extends "base.html" %}
+{% block title %}Checkout | PRAUXE{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-10">
+    <div class="max-w-5xl mx-auto px-4">
+        <!-- Progress Indicator -->
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center gap-2 text-pink-600 font-semibold">
+                <span class="w-8 h-8 flex items-center justify-center rounded-full bg-pink-100">1</span>
+                Cart Summary
+            </div>
+            <div class="flex-1 border-t border-gray-300 mx-4"></div>
+            <div class="flex items-center gap-2 text-pink-600 font-semibold">
+                <span class="w-8 h-8 flex items-center justify-center rounded-full bg-pink-100">2</span>
+                Shipping Details
+            </div>
+            <div class="flex-1 border-t border-gray-300 mx-4"></div>
+            <div class="flex items-center gap-2 text-gray-400 font-semibold">
+                <span class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300">3</span>
+                Payment
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Cart Summary -->
+            <div class="bg-white rounded-xl shadow-lg p-6 lg:col-span-1">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">🛒 Your Cart</h2>
+                <ul class="divide-y">
+                    {% for item in cart_items %}
+                    <li class="py-3 flex justify-between text-gray-700">
+                        <span>{{ item.name }} × {{ item.quantity }}</span>
+                        <span class="font-medium">₹{{ "%.2f"|format(item.total) }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="mt-6 text-right text-lg font-bold text-gray-900">
+                    Total: ₹{{ "%.2f"|format(total) }}
+                </div>
+            </div>
+
+            <!-- Shipping Details -->
+            <div class="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">📦 Shipping Details</h3>
+
+                <!-- Saved Address Toggle -->
+                <label class="flex items-center space-x-2 mb-6 cursor-pointer">
+                    <input type="checkbox" id="use_saved" class="w-5 h-5 text-pink-600 border-gray-300 rounded focus:ring-pink-500">
+                    <span class="text-gray-700">Use my saved address</span>
+                </label>
+
+                <form id="shipping-details-form" method="POST" action="{{ url_for('create_order') }}" class="space-y-5">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="amount" value="{{ '%.2f'|format(total) }}">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="name" name="name" placeholder="Full Name" required class="input-field" value="{{ name or '' }}">
+                        <input type="email" id="email" name="email" placeholder="Email Address" required class="input-field" value="{{ email or '' }}">
+                        <input type="tel" id="phone" name="phone" placeholder="Phone Number" required class="input-field" value="{{ phone or '' }}">
+                        <input type="text" id="house_no" name="house_no" placeholder="House No." required class="input-field" value="{{ house_no or '' }}">
+                        <input type="text" id="road" name="road" placeholder="Road/Street" required class="input-field" value="{{ road or '' }}">
+                        <input type="text" id="area" name="area" placeholder="Area/Locality (optional)" class="input-field" value="{{ area or '' }}">
+                        <input type="text" id="city" name="city" placeholder="City" required class="input-field" value="{{ city or '' }}">
+                        <input type="text" id="state" name="state" placeholder="State" required class="input-field" value="{{ state or '' }}">
+                        <div class="md:col-span-2">
+                            <input type="text" id="pincode" name="pincode" placeholder="PIN Code" required class="input-field" value="{{ pincode or '' }}">
+                            <p id="pincode-message" class="mt-2 text-sm"></p>
+                        </div>
+                        <select id="shipping_method" name="shipping_method" required class="input-field md:col-span-2">
+                            <option value="">Select Shipping Method</option>
+                            <option value="Standard Shipping" {% if shipping_method == 'Standard Shipping' %}selected{% endif %}>Standard (5–7 days)</option>
+                            <option value="Express Shipping" {% if shipping_method == 'Express Shipping' %}selected{% endif %}>Express (2–3 days)</option>
+                            <option value="COD" {% if shipping_method == 'COD' %}selected{% endif %}>Cash on Delivery</option>
+                        </select>
+                    </div>
+
+                    <!-- Save Address Checkbox -->
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" name="save_to_profile" {% if save_to_profile %}checked{% endif %} class="w-5 h-5 text-pink-600 border-gray-300 rounded focus:ring-pink-500">
+                        <span class="text-gray-700">Save this address to my profile</span>
+                    </label>
+
+                    <!-- Proceed to Payment -->
+                    <button type="submit" id="proceed-to-payment-btn" class="w-full mt-4 flex items-center justify-center gap-2 px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg shadow-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a4 4 0 10-8 0v2m4 4v6m-4-6h8" />
+                        </svg>
+                        Proceed to Payment ₹{{ "%.2f"|format(total) }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .input-field {
+        @apply border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500;
+    }
+</style>
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // ---------- Prefill (Use Saved Address) ----------
+    const savedData = {
+        name: "{{ user.name or '' }}",
+        email: "{{ user.email or '' }}",
+        phone: "{{ user.mobile or '' }}",
+        house_no: "{{ user.house_no or '' }}",
+        road: "{{ user.road or '' }}",
+        area: "{{ user.area or '' }}",
+        city: "{{ user.city or '' }}",
+        state: "{{ user.state or '' }}",
+        pincode: "{{ user.pincode or '' }}"
+    };
+
+    function fillForm(data) {
+        for (let key in data) {
+            const input = document.getElementById(key);
+            if (input) input.value = data[key];
+        }
+    }
+    function clearForm() {
+        document.querySelectorAll('#shipping-details-form input').forEach(input => {
+            if (input.id !== 'email') input.value = '';
+        });
+        document.getElementById('shipping_method').value = '';
+    }
+    document.getElementById("use_saved").addEventListener("change", function () {
+        this.checked ? fillForm(savedData) : clearForm();
+        const currentPincode = pincodeInput.value.trim();
+        if (currentPincode.length === 6 && validatePincodeFormat(currentPincode)) {
+            checkPincodeServiceability(currentPincode);
+        } else {
+            pincodeMessage.textContent = '';
+            pincodeMessage.classList.remove('text-green-600', 'text-red-500');
+            proceedToPaymentBtn.disabled = true;
+            proceedToPaymentBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+        updateButtonText();
+    });
+
+    // ---------- Pincode validation + gating the submit ----------
+    const pincodeInput = document.getElementById('pincode');
+    const pincodeMessage = document.getElementById('pincode-message');
+    const proceedToPaymentBtn = document.getElementById('proceed-to-payment-btn');
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+    function validatePincodeFormat(pincode) {
+        const pincodeRegex = /^[1-9][0-9]{5}$/;
+        return pincodeRegex.test(pincode);
+    }
+
+    let debounceTimer;
+    proceedToPaymentBtn.disabled = true;
+    proceedToPaymentBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+    pincodeInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        pincodeMessage.textContent = 'Checking...';
+        pincodeMessage.classList.remove('text-green-600', 'text-red-500');
+        proceedToPaymentBtn.disabled = true;
+        proceedToPaymentBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+        const pincode = this.value.trim();
+        if (pincode.length === 6) {
+            if (!validatePincodeFormat(pincode)) {
+                pincodeMessage.textContent = "Incorrect pincode. Enter a valid 6-digit pincode.";
+                pincodeMessage.classList.add('text-red-500');
+                return;
+            }
+            debounceTimer = setTimeout(() => checkPincodeServiceability(pincode), 500);
+        } else {
+            pincodeMessage.textContent = '';
+            pincodeMessage.classList.remove('text-green-600', 'text-red-500');
+        }
+    });
+
+    pincodeInput.addEventListener('blur', function() {
+        clearTimeout(debounceTimer);
+        const pincode = this.value.trim();
+        if (pincode.length === 6 && validatePincodeFormat(pincode)) {
+            checkPincodeServiceability(pincode);
+        } else if (pincode.length > 0 && pincode.length !== 6) {
+            pincodeMessage.textContent = "Incorrect pincode. Enter a valid 6-digit pincode.";
+            pincodeMessage.classList.add('text-red-500');
+            proceedToPaymentBtn.disabled = true;
+            proceedToPaymentBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+            pincodeMessage.textContent = '';
+            pincodeMessage.classList.remove('text-green-600', 'text-red-500');
+            proceedToPaymentBtn.disabled = true;
+            proceedToPaymentBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+    });
+
+    function checkPincodeServiceability(pincode) {
+        pincodeMessage.textContent = "Checking serviceability...";
+        pincodeMessage.classList.remove('text-green-600', 'text-red-500');
+        pincodeMessage.style.color = 'gray';
+
+        const formData = new FormData();
+        formData.append('pincode', pincode);
+        formData.append('csrf_token', csrfToken);
+
+        fetch("{{ url_for('check_pincode_serviceability') }}", {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    throw new Error(errorData.message || `Server error: ${response.status}`);
+                }).catch(() => { throw new Error(`Server error: ${response.status}`); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.serviceable) {
+                const deliveryTime = data.delivery_time ? ` (expected in ${data.delivery_time} days)` : ' (expected in 3-5 days)';
+                pincodeMessage.textContent = `We will deliver here!${deliveryTime}`;
+                pincodeMessage.classList.remove('text-red-500');
+                pincodeMessage.classList.add('text-green-600');
+                pincodeMessage.style.color = '';
+                proceedToPaymentBtn.disabled = false;
+                proceedToPaymentBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                pincodeMessage.textContent = data.message || 'Currently not serviceable, will come to you soon!';
+                pincodeMessage.classList.remove('text-green-600');
+                pincodeMessage.classList.add('text-red-500');
+                pincodeMessage.style.color = '';
+                proceedToPaymentBtn.disabled = true;
+                proceedToPaymentBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        })
+        .catch(error => {
+            console.error('Error checking pincode:', error);
+            pincodeMessage.textContent = `Error: ${error.message || 'Unknown error'}. Please try again.`;
+            pincodeMessage.classList.remove('text-green-600');
+            pincodeMessage.classList.add('text-red-500');
+            pincodeMessage.style.color = '';
+            proceedToPaymentBtn.disabled = true;
+            proceedToPaymentBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        });
+    }
+
+    const initialPincode = pincodeInput.value.trim();
+    if (initialPincode.length === 6 && validatePincodeFormat(initialPincode)) {
+        setTimeout(() => checkPincodeServiceability(initialPincode), 100);
+    } else {
+        proceedToPaymentBtn.disabled = true;
+        proceedToPaymentBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        if (initialPincode.length > 0) {
+            pincodeMessage.textContent = "Incorrect pincode. Enter a valid 6-digit pincode.";
+            pincodeMessage.classList.add('text-red-500');
+        }
+    }
+
+    // ---------- Razorpay: only for ONLINE (not COD) ----------
+    const orderId = {{ order_id | tojson }};                       // Razorpay order id (for ONLINE only)
+    const totalAmount = parseInt("{{ amount | default(0) }}") || 0;
+    const razorpayKeyId = {{ key_id | tojson }};
+    const shippingMethodSelect = document.getElementById("shipping_method");
+
+    function shouldOpenRazorpay() {
+        return (
+            shippingMethodSelect.value !== "COD" &&
+            orderId && orderId !== null &&
+            !isNaN(totalAmount) && totalAmount > 0 &&
+            razorpayKeyId && razorpayKeyId !== null
+        );
+    }
+
+    function updateButtonText() {
+        if (shippingMethodSelect.value === "COD") {
+            proceedToPaymentBtn.textContent = 'Place Order (COD) ₹{{ "%.2f"|format(total) }}';
+        } else {
+            proceedToPaymentBtn.textContent = 'Proceed to Payment ₹{{ "%.2f"|format(total) }}';
+        }
+    }
+    shippingMethodSelect.addEventListener('change', updateButtonText);
+    updateButtonText();
+
+    if (shouldOpenRazorpay()) {
+        console.log("DEBUG: Opening Razorpay popup for ONLINE payment...");
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const house_no = document.getElementById("house_no").value.trim();
+        const road = document.getElementById("road").value.trim();
+        const area = document.getElementById("area").value.trim();
+        const city = document.getElementById("city").value.trim();
+        const state = document.getElementById("state").value.trim();
+        const pincode = document.getElementById("pincode").value.trim();
+        const shipping_method = document.getElementById("shipping_method").value;
+        const saveToProfile = document.querySelector('input[name="save_to_profile"]').checked;
+
+        const options = {
+            key: razorpayKeyId,
+            amount: totalAmount,
+            currency: "INR",
+            name: "PRAUXE Store",
+            description: "Purchase from cart",
+            order_id: orderId,
+            handler: function (response) {
+                const formDataForPaymentSuccess = {
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_signature: response.razorpay_signature,
+                    name, email, phone, house_no, road, area, city, state, pincode,
+                    shipping_method,
+                    save_to_profile: saveToProfile ? 'true' : 'false',
+                    csrf_token: csrfToken
+                };
+                fetch("/payment_success", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: new URLSearchParams(formDataForPaymentSuccess)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = data.url;
+                    } else {
+                        alert("Payment recorded, but something went wrong:\n" + data.message);
+                        window.location.href = "{{ url_for('payment_failed') }}";
+                    }
+                })
+                .catch(err => {
+                    console.error("Error during fetch to /payment_success:", err);
+                    alert("Error processing payment: " + err);
+                    window.location.href = "{{ url_for('payment_failed') }}";
+                });
+            },
+            prefill: { name, email, contact: phone },
+            notes: { address: `${house_no}, ${road}, ${area}, ${city}, ${state} - ${pincode}` },
+            theme: { color: "#F37254" }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+            console.error("Payment failed:", response);
+            alert("Payment Failed: " + response.error.description + " (Code: " + response.error.code + ")");
+            window.location.href = "{{ url_for('payment_failed') }}";
+        });
+        rzp.open();
+    } else {
+        console.log("DEBUG: Razorpay not opened (COD or missing order).");
+    }
+
+    // ---------- Form submit guard ----------
+    const shippingDetailsForm = document.getElementById('shipping-details-form');
+    shippingDetailsForm.addEventListener('submit', function (event) {
+        if (proceedToPaymentBtn.disabled) {
+            event.preventDefault();
+            alert("Please ensure the pincode is checked and serviceable before proceeding.");
+            return false;
+        }
+        if (!this.checkValidity()) {
+            alert("Please fill in all required fields.");
+            return false;
+        }
+        // For COD: server creates order and redirects to Thank-You.
+        // For ONLINE: server creates Razorpay order and re-renders; this JS will open Razorpay.
+        console.log("DEBUG: Form valid. Submitting to server...");
+    });
+});
+</script>
+
+
+{% endblock %}

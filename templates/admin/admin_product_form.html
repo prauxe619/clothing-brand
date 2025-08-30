@@ -1,0 +1,225 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto mt-10 p-8 bg-white rounded-2xl shadow-xl">
+    <h1 class="text-4xl font-bold font-playfair text-center text-pink-600 mb-10">
+        {{ title }}
+    </h1>
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-8">
+        {{ form.csrf_token }}
+
+        {# Flash Messages #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flashes mb-4">
+              {% for category, message in messages %}
+                <li class="p-3 mb-2 rounded-md {% if category == 'danger' %}bg-red-100 text-red-700{% elif category == 'success' %}bg-green-100 text-green-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                    {{ message }}
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="{{ form.name.id }}" class="block text-sm font-medium text-gray-700">{{ form.name.label }}</label>
+                {{ form.name(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500") }}
+                {% for error in form.name.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div>
+                <label for="{{ form.price.id }}" class="block text-sm font-medium text-gray-700">{{ form.price.label }}</label>
+                {{ form.price(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500") }}
+                {% for error in form.price.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div>
+                <label for="{{ form.category.id }}" class="block text-sm font-medium text-gray-700">{{ form.category.label }}</label>
+                {{ form.category(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500") }}
+                {% for error in form.category.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div>
+                <label for="{{ form.tag.id }}" class="block text-sm font-medium text-gray-700">{{ form.tag.label }}</label>
+                {{ form.tag(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500") }}
+                {% for error in form.tag.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            
+
+            {# Main Image #}
+            <div>
+                <label for="{{ form.main_image.id }}" class="block text-sm font-medium text-gray-700">
+                    {{ form.main_image.label }} <span class="text-red-500 text-xs">(Required)</span>
+                </label>
+                {{ form.main_image(class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none") }}
+                {% for error in form.main_image.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                {% endfor %}
+
+                {% if product %}
+                    {% set main_image = product.images | selectattr('is_main') | first %}
+                    {% if main_image %}
+                        <img src="{{ main_image.image_url }}" alt="Main Image" class="mt-4 w-32 h-32 object-cover rounded-lg shadow">
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        {# Additional Images #}
+        <div class="mt-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Additional Images</h3>
+            <div id="additional-images-container" class="space-y-4">
+                {% for field_entry in form.additional_images.entries %}
+                    <div class="flex items-center space-x-4">
+                        <input type="file" name="{{ field_entry.name }}" id="{{ field_entry.id }}" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
+                        {% if field_entry.errors %}
+                            <ul class="errors">
+                                {% for error in field_entry.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                {% if product %}
+                    {% for img in product.images if not img.is_main %}
+                        <div class="flex items-center space-x-4 mt-2">
+                            <img src="{{ img.image_url }}" alt="Additional Image" class="w-20 h-20 object-cover rounded-lg shadow">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="delete_image_ids" value="{{ img.id }}">
+                                <span class="text-sm text-gray-700">Delete</span>
+                            </label>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <button type="button" id="add-additional-image" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Add More Images</button>
+        </div>
+
+        {# Description #}
+        <div>
+            <label for="{{ form.description.id }}" class="block text-sm font-medium text-gray-700">{{ form.description.label }}</label>
+            {{ form.description(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 h-24") }}
+            {% for error in form.description.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        {# Sizes + Quantities Section #}
+        {# Sizes + Quantities Section #}
+<div class="mt-6">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Sizes & Quantities</h3>
+    <div id="sizes-container" class="space-y-3">
+        {% for subform in form.sizes_and_quantities %}
+            <div class="flex items-center gap-4 size-entry">
+                {{ subform.size(class="w-40 rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500") }}
+                {{ subform.quantity(class="w-32 rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500", placeholder="Qty") }}
+
+                <!-- hidden inputs for add_product route -->
+                <input type="hidden" name="sizes[]" value="{{ subform.size.data }}">
+                <input type="hidden" name="quantities[]" value="{{ subform.quantity.data }}">
+
+                <button type="button" class="remove-size px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600">X</button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <button type="button" id="add-size" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+        + Add Size
+    </button>
+</div>
+
+
+        
+        {# Colors #}
+        <div class="mt-6">
+            <label for="{{ form.colors.id }}" class="block text-sm font-medium text-gray-700">{{ form.colors.label }}</label>
+            {{ form.colors(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500", multiple="multiple", size="5") }}
+            {% for error in form.colors.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+            {% endfor %}
+            <div class="flex flex-wrap mt-2 gap-2">
+                {% if product and product.colors %}
+                    {% for color in product.colors %}
+                        <span class="inline-block w-6 h-6 rounded-full border border-gray-300" style="background-color: {{ color.hex_code or '#ccc' }};" title="{{ color.name }}"></span>
+                    {% endfor %}
+                {% else %}
+                    <span class="text-gray-400 text-sm">No colors selected</span>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Submit #}
+        <div class="flex justify-between items-center pt-6 border-t mt-6">
+            <button type="submit" class="inline-flex items-center px-6 py-3 bg-pink-600 text-white text-sm font-medium rounded-lg shadow hover:bg-pink-700 transition duration-300">
+                Save Product
+            </button>
+            <a href="{{ url_for('admin_products') }}" class="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg shadow-sm bg-white hover:bg-gray-50 transition duration-300">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById("add-additional-image").addEventListener("click", function () {
+    const container = document.getElementById("additional-images-container");
+    const newInput = document.createElement("input");
+    newInput.type = "file";
+    newInput.name = "additional_images-" + container.children.length;
+    newInput.className = "block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none mt-2";
+    container.appendChild(newInput);
+});
+</script>
+<script>
+document.getElementById("add-size").addEventListener("click", function () {
+    const container = document.getElementById("sizes-container");
+    const index = container.children.length; // for naming new fields
+
+    // Build new size+quantity row
+    const newRow = document.createElement("div");
+    newRow.className = "flex items-center gap-4 size-entry";
+
+    newRow.innerHTML = `
+        <select name="sizes_and_quantities-${index}-size"
+                class="w-40 rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500"
+                onchange="this.nextElementSibling.nextElementSibling.value=this.value">
+            {% for s in ALL_SIZES %}
+                <option value="{{ s.id }}">{{ s.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="number" name="sizes_and_quantities-${index}-quantity" placeholder="Qty"
+               class="w-32 rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500"
+               oninput="this.nextElementSibling.value=this.value">
+
+        <!-- hidden inputs that backend will use in add_product -->
+        <input type="hidden" name="sizes[]" value="{{ ALL_SIZES[0].id }}">
+        <input type="hidden" name="quantities[]" value="0">
+
+        <button type="button" class="remove-size px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600">X</button>
+    `;
+
+    container.appendChild(newRow);
+});
+
+// Event delegation for remove buttons
+document.getElementById("sizes-container").addEventListener("click", function (e) {
+    if (e.target.classList.contains("remove-size")) {
+        e.target.parentElement.remove();
+    }
+});
+</script>
+
+{% endblock %}

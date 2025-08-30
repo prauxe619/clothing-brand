@@ -1,0 +1,128 @@
+{% extends 'admin/base.html' %}
+{% block title %}Site Settings{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <h1 class="text-2xl font-semibold mb-6">Site Settings</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+
+        <!-- Site Name -->
+        <div class="mb-4">
+            {{ form.site_name.label(class="block text-sm font-medium text-gray-700") }}
+            {{ form.site_name(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm") }}
+        </div>
+
+        <!-- Tagline -->
+        <div class="mb-4">
+            {{ form.site_tagline.label(class="block text-sm font-medium text-gray-700") }}
+            {{ form.site_tagline(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm") }}
+        </div>
+
+        <!-- Contact Email -->
+        <div class="mb-4">
+            {{ form.contact_email.label(class="block text-sm font-medium text-gray-700") }}
+            {{ form.contact_email(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm") }}
+        </div>
+
+        <!-- Support Phone -->
+        <div class="mb-4">
+            {{ form.support_phone.label(class="block text-sm font-medium text-gray-700") }}
+            {{ form.support_phone(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm") }}
+        </div>
+
+
+        <!-- Google Analytics --> 
+        <div class="mb-4">
+            {{ form.google_analytics_id.label(class="block text-sm font-medium text-gray-700") }}
+            {{ form.google_analytics_id(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm") }}
+        </div>
+
+        <!-- Microsoft Clarity -->
+        <div class="mb-4">
+            {{ form.microsoft_clarity_id.label(class="block text-sm font-medium text-gray-700") }}
+            {{ form.microsoft_clarity_id(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm") }}
+        </div>
+
+        <h3 class="text-lg font-semibold mt-6 mb-2">Social Media Links</h3>
+{{ form.facebook_url.label }} {{ form.facebook_url(class="w-full") }}
+{{ form.instagram_url.label }} {{ form.instagram_url(class="w-full") }}
+{{ form.twitter_url.label }} {{ form.twitter_url(class="w-full") }}
+{{ form.linkedin_url.label }} {{ form.linkedin_url(class="w-full") }}
+
+<h3 class="text-lg font-semibold mt-6 mb-2">Footer Content</h3>
+{{ form.footer_about.label }} {{ form.footer_about(class="w-full", rows="3") }}
+{{ form.footer_links.label }} {{ form.footer_links(class="w-full", rows="3") }}
+
+<h3 class="text-lg font-semibold mt-6 mb-2">Payment Method Toggles</h3>
+<div class="flex items-center space-x-4">
+  <label>{{ form.enable_razorpay() }} {{ form.enable_razorpay.label.text }}</label>
+  <label>{{ form.enable_cod() }} {{ form.enable_cod.label.text }}</label>
+</div>
+
+
+        <!-- Meta Title -->
+        <div class="mb-4">
+            {{ form.meta_title.label(class="block text-sm font-medium text-gray-700") }}
+            {{ form.meta_title(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm") }}
+        </div>
+
+        <!-- Meta Description -->
+        <div class="mb-4">
+            {{ form.meta_description.label(class="block text-sm font-medium text-gray-700") }}
+            {{ form.meta_description(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm") }}
+        </div>
+
+        <!-- Meta Keywords -->
+        <div class="mb-4">
+            {{ form.meta_keywords.label(class="block text-sm font-medium text-gray-700") }}
+            {{ form.meta_keywords(class="mt-1 block w-full rounded-md border-gray-300 shadow-sm") }}
+        </div>
+
+        <!-- Maintenance Mode -->
+        <div class="mb-4">
+            {{ form.maintenance_mode.label(class="inline-block text-sm font-medium text-gray-700 mr-2") }}
+            {{ form.maintenance_mode() }}
+        </div>
+
+        <!-- Logo Upload + Live Preview -->
+<div>
+  {{ form.logo_file.label }}
+  {{ form.logo_file(class="block mb-2", onchange="previewImage(this, 'logoPreview')") }}
+  <img id="logoPreview" src="{{ settings.logo_path if settings and settings.logo_path else '' }}" class="h-16 mt-2" />
+</div>
+
+<!-- Favicon Upload + Live Preview -->
+<div>
+  {{ form.favicon_file.label }}
+  {{ form.favicon_file(class="block mb-2", onchange="previewImage(this, 'faviconPreview')") }}
+  <img id="faviconPreview" src="{{ settings.favicon_path if settings and settings.favicon_path else '' }}" class="h-10 mt-2" />
+</div>
+
+
+        <!-- Submit Button -->
+        <div class="mt-6">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded">
+                Save Settings
+            </button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+<script>
+function previewImage(input, previewId) {
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+        document.getElementById(previewId).src = e.target.result;
+    };
+
+    if (file) {
+        reader.readAsDataURL(file);
+    }
+}
+</script>
+

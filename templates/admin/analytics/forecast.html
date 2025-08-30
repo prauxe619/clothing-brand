@@ -1,0 +1,71 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Sales Forecast{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-6">
+  <div class="bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-3xl font-semibold text-gray-800 mb-2">📈 Sales Forecast</h1>
+    <p class="text-gray-600 mb-6">View predicted sales trends based on previous order data. Use this to make smarter inventory and marketing decisions.</p>
+
+    <div id="forecast-chart" class="w-full h-[500px]"></div>
+  </div>
+</div>
+
+<script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+<script>
+    const dates = {{ dates | tojson }};
+    const predictions = {{ predictions | tojson }};
+    const lowerBounds = {{ lower_bounds | tojson }};
+    const upperBounds = {{ upper_bounds | tojson }};
+    const actualDates = {{ actual_dates | tojson }};
+    const actualSales = {{ actual_sales | tojson }};
+
+    const forecastLine = {
+        x: dates,
+        y: predictions,
+        mode: 'lines+markers',
+        name: 'Forecast',
+        line: { color: '#3b82f6' }  // Tailwind blue
+    };
+
+    const lowerTrace = {
+        x: dates,
+        y: lowerBounds,
+        mode: 'lines',
+        name: 'Lower Bound',
+        line: { color: 'rgba(59, 130, 246, 0.2)' },
+        showlegend: false
+    };
+
+    const upperTrace = {
+        x: dates,
+        y: upperBounds,
+        fill: 'tonexty',
+        mode: 'lines',
+        name: 'Upper Bound',
+        line: { color: 'rgba(59, 130, 246, 0.2)' },
+        showlegend: false
+    };
+
+    const actualLine = {
+        x: actualDates,
+        y: actualSales,
+        mode: 'lines+markers',
+        name: 'Actual Sales',
+        line: { color: '#10b981' }  // Tailwind green
+    };
+
+    const data = [lowerTrace, upperTrace, forecastLine, actualLine];
+
+    const layout = {
+        title: 'Sales Forecast vs Actual',
+        xaxis: { title: 'Date' },
+        yaxis: { title: 'Amount' },
+        legend: { orientation: 'h' }
+    };
+
+    Plotly.newPlot('forecast-chart', data, layout);
+</script>
+
+{% endblock %}

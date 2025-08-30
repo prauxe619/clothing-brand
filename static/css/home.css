@@ -1,0 +1,128 @@
+
+/* Reusing your MEN’S COLLECTION styles */
+.collection-header {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 30px 20px 20px;
+    text-align: center;
+    color: #222;
+    position: relative;
+}
+.collection-header::after {
+    content: "";
+    display: block;
+    width: 50px;
+    height: 3px;
+    background-color: #000;
+    margin: 6px auto 0;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 0 16px 40px;
+    max-width: 1350px;
+    margin: auto;
+}
+@media (max-width: 767px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 0 8px 20px;
+    }
+    .product-image {
+        height: clamp(200px, 60vw, 250px);
+    }
+    .product-name {
+        font-size: 0.8rem;
+        line-height: 1.2;
+    }
+    .product-price {
+        font-size: 0.85rem;
+    }
+    .wishlist-button {
+        font-size: 18px;
+        padding: 4px;
+    }
+}
+@media (max-width: 480px) {
+    .collection-header {
+        font-size: 1.5rem;
+    }
+}
+
+.product-card {
+    background: transparent;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+.product-card:hover {
+    transform: translateY(-4px);
+}
+
+.product-image-link {
+    position: relative;
+    display: block;
+    width: 100%;
+    overflow: hidden;
+}
+.product-image {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+.product-image-link:hover .product-image {
+    transform: scale(1.05);
+}
+
+.product-name {
+    font-weight: 500;
+    color: #333;
+    margin: 6px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.9rem;
+    text-align: left;
+}
+.product-price {
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+}
+
+.wishlist-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+.wishlist-button:hover {
+    transform: scale(1.2);
+}
+.wishlist-button i {
+    font-size: 20px;
+}
+.wishlist-button .fas {
+    color: #ef4444;
+}
+.wishlist-button .far {
+    color: #3a3838;
+}

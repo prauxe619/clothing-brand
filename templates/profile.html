@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Profile</h2>
+
+<h3>User Info</h3>
+<ul>
+  <li><strong>Username:</strong> {{ user.username }}</li>
+  <li><strong>Email:</strong> {{ user.email }}</li>
+  <li><strong>Mobile:</strong> {{ user.mobile or 'Not set' }}</li>
+  <li><strong>Gender:</strong> {{ user.gender or 'Not set' }}</li>
+</ul>
+
+<h3>Recent Orders</h3>
+{% if recent_orders %}
+<table>
+  <thead>
+    <tr><th>Order ID</th><th>Status</th><th>Amount</th><th>Date</th></tr>
+  </thead>
+  <tbody>
+    {% for order in recent_orders %}
+    <tr>
+      <td><a href="{{ url_for('order_detail', order_id=order.order_id) }}">{{ order.order_id }}</a></td>
+      <td>{{ order.status }}</td>
+      <td>₹{{ order.amount / 100 }}</td>
+      <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>You have no recent orders.</p>
+{% endif %}
+
+{% endblock %}

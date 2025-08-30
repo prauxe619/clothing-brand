@@ -1,0 +1,24 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<h2 class="text-xl font-bold mb-4">Frontend User Activity Logs</h2>
+<table class="w-full table-auto text-sm border">
+  <thead>
+    <tr>
+      <th class="px-2 py-1">Timestamp</th>
+      <th class="px-2 py-1">User</th>
+      <th class="px-2 py-1">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for log in logs %}
+    <tr class="border-t">
+      <td class="px-2 py-1">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      <td class="px-2 py-1">{{ log.user.username if log.user else 'Unknown' }}</td>
+      <td class="px-2 py-1">{{ log.action }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="3" class="text-center p-2">No logs found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

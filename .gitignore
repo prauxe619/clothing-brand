@@ -1,0 +1,44 @@
+# --------------------
+# Python
+# --------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# --------------------
+# Environment / Secrets
+# --------------------
+.env
+*.env
+*.key
+*.secret
+app.txt   # your file where keys were stored
+
+# --------------------
+# Logs & Databases
+# --------------------
+*.log
+*.sqlite3
+instance/
+
+# --------------------
+# IDE / Editor files
+# --------------------
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# --------------------
+# Build / Packaging
+# --------------------
+*.egg-info/
+dist/
+build/

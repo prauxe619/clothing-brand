@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat with GPT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="max-w-2xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+        <h1 class="text-2xl font-semibold mb-4 text-center">Talk to GPT</h1>
+
+        <div id="chatbox" class="h-96 overflow-y-auto border rounded p-4 bg-gray-50 text-sm mb-4 space-y-2"></div>
+
+        <div class="flex gap-2">
+            <input type="text" id="input" placeholder="Type your message..."
+                   class="flex-grow border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <button onclick="sendMessage(this)" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+             Send
+            </button>
+
+
+        </div>
+
+        <p id="error" class="text-red-600 text-sm mt-2 hidden"></p>
+    </div>
+
+    <script>
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, (match) => {
+    const escapeMap = {
+      '&': "&amp;",
+      '<': "&lt;",
+      '>': "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    };
+    return escapeMap[match];
+  });
+}
+
+async function sendMessage(button) {
+    const input = document.getElementById("input");
+    const chatbox = document.getElementById("chatbox");
+    const error = document.getElementById("error");
+    const message = input.value.trim();
+    if (!message) return;
+
+    error.classList.add("hidden");
+    input.value = "";
+    input.disabled = true;
+    button.disabled = true;
+
+    // Append user message safely
+    const userDiv = document.createElement("div");
+    userDiv.className = "text-blue-700";
+    const userStrong = document.createElement("b");
+    userStrong.textContent = "You:";
+    userDiv.appendChild(userStrong);
+    userDiv.appendChild(document.createTextNode(" " + message));
+    chatbox.appendChild(userDiv);
+
+    // Append loading message safely
+    const loadingDiv = document.createElement("div");
+    loadingDiv.id = "loading";
+    loadingDiv.className = "text-gray-500 animate-pulse";
+    loadingDiv.textContent = "GPT is thinking...";
+    chatbox.appendChild(loadingDiv);
+
+    chatbox.scrollTop = chatbox.scrollHeight;
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    try {
+        const res = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({ message })
+        });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Server error: ${res.status} - ${errorText.slice(0, 100)}`);
+        }
+
+        const data = await res.json();
+        loadingDiv.remove();
+
+        if (data.reply && data.reply.trim()) {
+            const botDiv = document.createElement("div");
+            botDiv.className = "text-green-700";
+            const botStrong = document.createElement("b");
+            botStrong.textContent = "GPT:";
+            botDiv.appendChild(botStrong);
+            botDiv.appendChild(document.createTextNode(" " + data.reply));
+            chatbox.appendChild(botDiv);
+        } else {
+            throw new Error(data.error || "Received empty response.");
+        }
+
+    } catch (err) {
+        loadingDiv.remove();
+        error.textContent = "Error: " + err.message;
+        error.classList.remove("hidden");
+    } finally {
+        input.disabled = false;
+        button.disabled = false;
+        input.focus();
+    }
+
+    chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+</script>
+
+
+</body>
+</html>

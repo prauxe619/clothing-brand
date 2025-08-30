@@ -1,0 +1,27 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h2 class="text-xl font-bold mb-4">🔥 Click Logs</h2>
+
+<table class="table-auto w-full border">
+  <thead>
+    <tr class="bg-gray-200">
+      <th class="p-2 border">Page</th>
+      <th class="p-2 border">X</th>
+      <th class="p-2 border">Y</th>
+      <th class="p-2 border">Screen</th>
+      <th class="p-2 border">Time</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for click in clicks %}
+    <tr>
+      <td class="p-2 border">{{ click.page }}</td>
+      <td class="p-2 border">{{ click.x }}</td>
+      <td class="p-2 border">{{ click.y }}</td>
+      <td class="p-2 border">{{ click.screen_width }}×{{ click.screen_height }}</td>
+      <td class="p-2 border">{{ click.timestamp }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
