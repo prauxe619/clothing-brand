@@ -327,9 +327,9 @@
 
     <!-- Similar Products -->
 {% if similar_products %}
-<section>
+<section> class="w-full px-2 sm:px-4">
     <h2 class="collection-header">SIMILAR PRODUCTS</h2>
-    <div class="product-grid">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 w-full">
         {% for product in similar_products %}
         <div class="product-card">
             <!-- Image + Wishlist -->
@@ -362,7 +362,7 @@
 {% if recent_products %}
 <section>
     <h2 class="collection-header">RECENTLY VIEWED</h2>
-    <div class="product-grid">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 w-full">
         {% for product in recent_products %}
         <div class="product-card">
             <!-- Image + Wishlist -->

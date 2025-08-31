@@ -57,7 +57,7 @@ CORS(app)
 
 # --- 3. Configuration ---
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "your_strong_fallback_secret_key_here") # Use a strong fallback for dev
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+psycopg2://superadmin:Mahadev619%40@localhost:5432/prauxe_db"
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("SQLALCHEMY_DATABASE_URI")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads' # Original upload folder for product images
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
@@ -93,6 +93,8 @@ csrf = CSRFProtect(app) # Initialize CSRFProtect with app instance
 mail = Mail(app)
 cache.init_app(app, config={'CACHE_TYPE': 'SimpleCache'})
 
+
+print("✅ Using database:", app.config["SQLALCHEMY_DATABASE_URI"])
 cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
     api_key=os.getenv("CLOUDINARY_API_KEY"),

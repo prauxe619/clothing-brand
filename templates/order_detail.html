@@ -47,7 +47,90 @@
                     </div>
                     {% endif %}
     
-                    <a href="{{ url_for('track_order', order_db_id=order.id) }}" class="text-blue-600 font-semibold text-sm mt-4 inline-block">Track Order ></a>
+                    <!-- Order Progress Tracker -->
+<!-- Order Progress Tracker -->
+<div class="mt-6">
+  {% set steps = [
+    {'key': 'placed', 'label': 'Placed'},
+    {'key': 'processing', 'label': 'Processing'},
+    {'key': 'shipped', 'label': 'Shipped'},
+    {'key': 'delivered', 'label': 'Delivered'}
+  ] %}
+  {% set order_progress = {
+    'placed': 1,
+    'processing': 2,
+    'shipped': 3,
+    'delivered': 4
+  } %}
+  {% set current = order.status|lower %}
+  {% set active_index = order_progress.get(current, 1) %}
+
+  <h4 class="text-sm font-semibold text-gray-800 mb-4">Order Progress</h4>
+  <ol class="relative flex items-center justify-between w-full mb-8">
+    {% for step in steps %}
+      <li class="flex-1 flex flex-col items-center text-center relative">
+        <!-- Circle -->
+        <div class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2
+                    transition-all duration-500 ease-in-out
+                    {{ 'bg-emerald-500 border-emerald-500 text-white' if loop.index <= active_index else 'bg-white border-gray-300 text-gray-400' }}">
+          {{ loop.index }}
+        </div>
+        <!-- Label -->
+        <span class="mt-2 text-xs sm:text-sm font-medium
+                     {{ 'text-emerald-700' if loop.index <= active_index else 'text-gray-500' }}">
+          {{ step.label }}
+        </span>
+
+        <!-- Expected / Actual Date -->
+        <span class="mt-1 text-[11px] text-gray-500">
+          {% if step.key == 'placed' and order.created_at %}
+            {{ order.created_at.strftime('%b %d, %Y') }}
+          {% elif step.key == 'processing' and order.processing_at %}
+            {{ order.processing_at.strftime('%b %d, %Y') }}
+          {% elif step.key == 'shipped' and order.shipped_at %}
+            {{ order.shipped_at.strftime('%b %d, %Y') }}
+          {% elif step.key == 'delivered' and order.delivered_at %}
+            {{ order.delivered_at.strftime('%b %d, %Y') }}
+          {% elif step.key == 'delivered' and order.expected_delivery %}
+            Expected: {{ order.expected_delivery.strftime('%b %d, %Y') }}
+          {% elif step.key == 'shipped' and order.expected_delivery %}
+            Expected delivery: {{ order.expected_delivery.strftime('%b %d, %Y') }}
+          {% endif %}
+        </span>
+
+        <!-- Connector line -->
+        {% if not loop.last %}
+          <div class="absolute top-4 sm:top-5 left-1/2 w-full h-1 -translate-y-1/2">
+            <div class="h-1 w-full bg-gray-200"></div>
+            <div class="h-1 bg-emerald-500 absolute top-0 left-0 transition-all duration-700 ease-in-out"
+                 style="width: {{ 100 if loop.index < active_index else (50 if loop.index == active_index else 0) }}%;">
+            </div>
+          </div>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+
+  <!-- Current status -->
+  <div class="bg-gray-50 border rounded-xl p-4 text-center">
+    <p class="text-sm text-gray-700">
+      Current status:
+      <span class="font-semibold capitalize
+                   {% if order.status == 'delivered' %} text-emerald-600
+                   {% elif order.status == 'shipped' %} text-blue-600
+                   {% elif order.status == 'processing' %} text-amber-600
+                   {% else %} text-gray-600 {% endif %}">
+        {{ order.status }}
+      </span>
+      {% if order.expected_delivery %}
+        • Expected delivery by 
+        <span class="font-semibold text-gray-900">{{ order.expected_delivery.strftime('%b %d, %Y') }}</span>
+      {% endif %}
+    </p>
+  </div>
+</div>
+
+
                 </div>
     
                 <div class="border-t pt-6 text-center">

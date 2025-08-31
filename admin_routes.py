@@ -90,7 +90,8 @@ def dashboard():
         .filter(func.date(Order.created_at) == func.current_date()).scalar() or 0
 
     month_revenue = db.session.query(func.sum(Order.amount))\
-        .filter(func.strftime('%Y-%m', Order.created_at) == func.strftime('%Y-%m', func.now())).scalar() or 0
+        .filter(func.date_trunc('month', Order.created_at) == func.date_trunc('month', func.now()))\
+        .scalar() or 0
 
     low_stock = Product.query.filter(Product.stock < 5).all()
 
@@ -498,9 +499,56 @@ def theme_settings():
 
 
 @admin_bp.route('/admin/analytics/forecast')
+@login_required
+@admin_required
 def forecast_view():
-    data = ForecastData.query.order_by(ForecastData.date).all()
-    return render_template('admin/analytics/forecast.html', data=data)
+    forecasts = ForecastData.query.order_by(ForecastData.date).all()
+
+    if not forecasts:
+        return render_template('admin/analytics/forecast.html',
+                               no_data=True,
+                               dates=[],
+                               predictions=[],
+                               lower_bounds=[],
+                               upper_bounds=[],
+                               actual_dates=[],
+                               actual_sales=[],
+                               alert=None)
+
+    dates = [f.date.strftime('%Y-%m-%d') for f in forecasts]
+    predictions = [float(f.prediction) for f in forecasts]
+    lower_bounds = [float(f.lower_bound) for f in forecasts]
+    upper_bounds = [float(f.upper_bound) for f in forecasts]
+
+    # Actual sales from Orders
+    sales_data = (
+        db.session.query(
+            db.func.date(Order.created_at).label('date'),
+            db.func.sum(Order.amount).label('total')
+        )
+        .filter(Order.status.in_(["paid", "completed", "delivered"]))
+        .group_by(db.func.date(Order.created_at))
+        .all()
+    )
+    actual_dates = [d.date.strftime('%Y-%m-%d') for d in sales_data]
+    actual_sales = [float(d.total) for d in sales_data]
+
+    # Business alert if forecast looks low
+    threshold = 1000
+    alert = None
+    if predictions and predictions[-1] < threshold:
+        alert = "⚠️ Forecasted sales for next week are low. Consider promotions or campaigns."
+
+    return render_template('admin/analytics/forecast.html',
+                           no_data=False,
+                           dates=dates,
+                           predictions=predictions,
+                           lower_bounds=lower_bounds,
+                           upper_bounds=upper_bounds,
+                           actual_dates=actual_dates,
+                           actual_sales=actual_sales,
+                           alert=alert)
+
 
 @admin_bp.route('/admin/analytics/segments')
 def segment_view():
@@ -570,7 +618,6 @@ def admin_forecast():
         alert=alert
     )
 
-# ... (other imports and app setup) ...
 
 @admin_bp.route('/admin/newsletter-subscribers') # Changed URL for clarity/admin path
 @login_required
@@ -581,14 +628,26 @@ def list_subscribers_admin():
     if not current_user.is_authenticated:
         flash('Please log in to access this page.', 'error')
         return redirect(url_for('login'))
-    
-    # Placeholder for actual admin role check
-    # Replace 'is_admin' with your actual user role attribute/method
-    # For example: if not current_user.has_role('admin'):
-    # Or: if not current_user.is_admin: # If you have an is_admin boolean field on User model
-    # if current_user.email != "youradminemail@example.com": # Simple check, not recommended for production
-    #     flash('Access denied. You do not have administrator privileges.', 'error')
-    #     return redirect(url_for('dashboard')) # Or url_for('home')
-
     subscribers = NewsletterSubscriber.query.all()
     return render_template('admin/subscribers.html', subscribers=subscribers)
+
+
+@admin_bp.route("/admin/orders/<int:order_id>/update_status", methods=["POST"])
+@login_required
+def update_order_status(order_id):
+    # Only allow admins
+    if not current_user.is_admin:
+        flash("Unauthorized", "danger")
+        return redirect(url_for("admin_dashboard"))
+
+    order = Order.query.get_or_404(order_id)
+    new_status = request.form.get("status")
+
+    if new_status not in ["created", "paid", "shipped", "delivered", "cancelled"]:
+        flash("Invalid status", "danger")
+        return redirect(url_for("admin_dashboard"))
+
+    order.status = new_status
+    db.session.commit()
+    flash(f"Order #{order.order_id} updated to {new_status.title()}", "success")
+    return redirect(url_for("admin_dashboard"))
